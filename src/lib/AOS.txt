@@ -1,0 +1,11 @@
+import AOS from 'aos';
+import 'aos/dist/aos.css'; // 스타일 파일 import
+
+useEffect(() => {
+  AOS.init(); // AOS 초기화
+}, []);
+
+// AOS 애니메이션을 사용할 컴포넌트에 data-aos 속성 추가
+<div data-aos="fade-up">
+  애니메이션 적용된 요소
+</div>
