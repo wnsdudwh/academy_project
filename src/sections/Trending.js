@@ -14,7 +14,7 @@ import slideImg1 from '../static/image/TrendingNow/slide_test1.png';
 
 const Trending = () => {
     return (
-        <section className="w-full bg-[#F5F9FF]  py-12 pb-16" id="trending-now">
+        <section className="w-full bg-[#F5F9FF]  py-12" id="trending-now">
             <div className="max-w-[1280px] w-full  mx-auto">
                 <div className="w-full mb-7 font-semibold text-3xl text-zinc-800">TRENDING NOW</div>
 
@@ -47,7 +47,7 @@ const Trending = () => {
                     <SwiperSlide>
                         <div className="flex items-center justify-between max-h-[364px] overflow-hidden">
                             {/* 왼쪽 텍스트 영역 */}
-                            <div className="w-full md:w-1/3 bg-[#EE9046] text-white px-24 py-20 rounded-l-[2.5rem]">
+                            <div className="w-full md:w-1/3 bg-[#46cfee] text-white px-24 py-20 rounded-l-[2.5rem]">
                                 <h2 className="text-3xl font-normal mb-1">트렌드를 선두하는</h2>
                                 <h2 className="text-3xl font-semibold mb-6">‘디지털 컬러책자’</h2>
                                 <p className="text-sm font-light mb-10">학원교재, 절판도서, 보고서, 제안서,<br />대학교재, 소량가다록에 적합합니다.</p>
@@ -72,7 +72,7 @@ const Trending = () => {
                     <SwiperSlide>
                         <div className="flex items-center justify-between max-h-[364px] overflow-hidden">
                             {/* 왼쪽 텍스트 영역 */}
-                            <div className="w-full md:w-1/3 bg-[#EE9046] text-white px-24 py-20 rounded-l-[2.5rem]">
+                            <div className="w-full md:w-1/3 bg-[#7346eee5] text-white px-24 py-20 rounded-l-[2.5rem]">
                                 <h2 className="text-3xl font-normal mb-1">트렌드를 선두하는</h2>
                                 <h2 className="text-3xl font-semibold mb-6">‘디지털 컬러책자’</h2>
                                 <p className="text-sm font-light mb-10">학원교재, 절판도서, 보고서, 제안서,<br />대학교재, 소량가다록에 적합합니다.</p>
@@ -97,7 +97,7 @@ const Trending = () => {
                     <SwiperSlide>
                         <div className="flex items-center justify-between max-h-[364px] overflow-hidden">
                             {/* 왼쪽 텍스트 영역 */}
-                            <div className="w-full md:w-1/3 bg-[#EE9046] text-white px-24 py-20 rounded-l-[2.5rem]">
+                            <div className="w-full md:w-1/3 bg-[#d14db0] text-white px-24 py-20 rounded-l-[2.5rem]">
                                 <h2 className="text-3xl font-normal mb-1">트렌드를 선두하는</h2>
                                 <h2 className="text-3xl font-semibold mb-6">‘디지털 컬러책자’</h2>
                                 <p className="text-sm font-light mb-10">학원교재, 절판도서, 보고서, 제안서,<br />대학교재, 소량가다록에 적합합니다.</p>
