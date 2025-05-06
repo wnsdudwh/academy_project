@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import '../static/css/Trending.css';
+import '../../static/css/Trending.css';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -10,7 +10,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation'
 
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
-import slideImg1 from '../static/image/TrendingNow/slide_test1.png';
+import slideImg1 from '../../static/image/TrendingNow/slide_test1.png';
 
 const Trending = () => {
     return (

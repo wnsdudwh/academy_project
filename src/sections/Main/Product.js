@@ -1,6 +1,6 @@
 import React from 'react'
-import '../static/css/Product.css';
-import subImg6 from '../static/image/test/best/sub6.png';
+import '../../static/css/Product.css';
+import subImg6 from '../../static/image/test/best/sub6.png';
 
 const Product = () => {
     return (

@@ -1,11 +1,11 @@
 import React from 'react'
-import '../static/css/Favorite.css';
+import '../../static/css/Favorite.css';
 
-import subImg1 from '../static/image/test/best/sub1.png';
-import subImg2 from '../static/image/test/best/sub2.png';
-import subImg3 from '../static/image/test/best/sub3.png';
-import subImg4 from '../static/image/test/best/sub4.png';
-import subImg5 from '../static/image/test/best/sub5.png';
+import subImg1 from '../../static/image/test/best/sub1.png';
+import subImg2 from '../../static/image/test/best/sub2.png';
+import subImg3 from '../../static/image/test/best/sub3.png';
+import subImg4 from '../../static/image/test/best/sub4.png';
+import subImg5 from '../../static/image/test/best/sub5.png';
 
 const Favorite = () => {
     return (

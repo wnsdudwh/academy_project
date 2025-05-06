@@ -1,15 +1,15 @@
 import React from 'react'
-import '../static/css/Commodity.css';
+import '../../static/css/Commodity.css';
 
 
-import commodityImg1 from '../static/image/Commodity/test/1.png';
-import commodityImg2 from '../static/image/Commodity/test/2.png';
-import commodityImg3 from '../static/image/Commodity/test/3.png';
-import commodityImg4 from '../static/image/Commodity/test/4.png';
-import commodityImg5 from '../static/image/Commodity/test/5.png';
-import commodityImg6 from '../static/image/Commodity/test/6.png';
-import commodityImg7 from '../static/image/Commodity/test/7.png';
-import commodityImg8 from '../static/image/Commodity/test/8.png';
+import commodityImg1 from '../../static/image/Commodity/test/1.png';
+import commodityImg2 from '../../static/image/Commodity/test/2.png';
+import commodityImg3 from '../../static/image/Commodity/test/3.png';
+import commodityImg4 from '../../static/image/Commodity/test/4.png';
+import commodityImg5 from '../../static/image/Commodity/test/5.png';
+import commodityImg6 from '../../static/image/Commodity/test/6.png';
+import commodityImg7 from '../../static/image/Commodity/test/7.png';
+import commodityImg8 from '../../static/image/Commodity/test/8.png';
 
 const Commodity = () => {
     return (
