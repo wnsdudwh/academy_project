@@ -10,28 +10,34 @@ const Register = () => {
     const nameRef = useRef(null);
     const nickNameRef = useRef(null);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e) => 
+    {
         e.preventDefault();
         if (checkPw()) {
-            axios.post(server+'register',{
+            axios.post(server+'auth/register',
+            {
                 userid : idRef.current.value,
                 userpw : pwRef.current.value,
                 username : nameRef.current.value,
                 nickname : nickNameRef.current.value
-            }).then(function (resp) {
+            })
+            .then(function (resp) 
+            {
                 alert(resp.data);
                 window.location.href = '/';
-            }).catch(function (error) {
-                // 에레 출력하는것, 추후 삭제
+            })
+            .catch(function (error) 
+            {
+                // 에러 출력하는것, 추후 삭제
                 console.error(error);
             })
         }
     }
 
-    function checkPw() {
+    function checkPw() 
+    {
         return pwRef.current.value === pwCheckRef.current.value
     }
-
 
     return (
         <>
@@ -79,7 +85,7 @@ const Register = () => {
                             
                             <button class="w-full py-2 mt-2 bg-primary-400 rounded-md" type="button" onClick={handleSubmit}>회원가입</button>
                         </div>
-                        <p class="mt-5 mb-3 text-body-secondary">© 2025 Seong</p>
+                        <p class="mt-5 mb-3 text-body-secondary">© 2025 wwd</p>
                     </main>
                 </div>
             </div>
