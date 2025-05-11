@@ -2,7 +2,13 @@ import React from 'react'
 import '../../static/css/Header.css';
 import logo from '../../static/image/test/header/logo.png';
 
-const Header = () => {
+import { Link } from 'react-router-dom';
+import { FiUser, FiHeart, FiLogIn, FiLogOut } from "react-icons/fi";
+
+const Header = () => 
+{
+    const token = localStorage.getItem("token");
+
     return (
         <header className="w-full bg-slate-100 border-b-2 border-b-blue-200 h-[90px]" id="header">
             <div className="header max-w-[1280px] w-full h-full mx-auto flex flex-row justify-between items-center">
@@ -21,32 +27,48 @@ const Header = () => {
                 </div>
                 {/* 검색창 끝 */}
 
-                <div className="quick-menu basis-1/4 flex flex-1 justify-end">
-                    <div className="log-in">
-                        <a href="#">
-                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/></svg>
-                        </a>
+                <div className="quick-menu basis-1/4 flex flex-1 justify-end gap-4 items-center">
+                    {token 
+                        ? (
+                            <>
+                                <Link to="/mypage"><FiUser /></Link> {/* 마이페이지 */}
+                                <FiLogOut onClick={() => 
+                                {
+                                    localStorage.removeItem("token");
+                                    localStorage.removeItem("nickname");
+                                    window.location.href = "/";
+                                }} />
+                            </>
+                        ) 
+                        : (
+                            <>
+                                <Link to="/login"><FiLogIn /></Link>   {/* 로그인 */}
+                                <Link to="/register"><FiUser /></Link> {/* 회원가입 */}
+                            </>
+                        )
+                    }
+                    <FiHeart /> {/* 최근 본 상품은 로그인 여부와 무관하게 항상 보여줌 */}
                     </div>
-                    
-
-                    <div className="my-page">
-                        <a href="#">
-                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                        </a>
-                    </div>
-
-                    <div className="shopping-cart">
-                        <a href="#"><svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/></svg>
-                        </a>
-                    </div>
-                    
-                </div>
                 {/* 퀵메뉴 끝 */}
             </div>
+            <button
+  onClick={() => {
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8080/attendance/check", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+      .then((res) => res.text())
+      .then((msg) => alert(msg))
+      .catch((err) => console.error(err));
+  }}
+    >출석 체크</button>
         </header>
+        
     )
 }
 

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
 
-const Register = () => {
+const Register = () => 
+{
     const server = process.env.REACT_APP_BACKEND_URL;
 
     const idRef = useRef(null);
@@ -10,34 +11,50 @@ const Register = () => {
     const nameRef = useRef(null);
     const nickNameRef = useRef(null);
 
+    const [errorMsg, setErrorMsg] = useState("");   //에러 메세지 상태
+
     const handleSubmit = (e) => 
     {
         e.preventDefault();
-        if (checkPw()) {
-            axios.post(server+'auth/register',
-            {
-                userid : idRef.current.value,
-                userpw : pwRef.current.value,
-                username : nameRef.current.value,
-                nickname : nickNameRef.current.value
-            })
-            .then(function (resp) 
-            {
-                alert(resp.data);
-                window.location.href = '/';
-            })
-            .catch(function (error) 
-            {
-                // 에러 출력하는것, 추후 삭제
-                console.error(error);
-            })
-        }
+        setErrorMsg("");    //초기화
+
+        const id = idRef.current.value.trim();
+        const pw = pwRef.current.value.trim();
+        const pwCheck = pwCheckRef.current.value.trim();
+        const name = nameRef.current.value.trim();
+        const nick = nickNameRef.current.value.trim();
+
+        // 1. 필드 유효성 검사
+        if (id.length < 4 || id.length > 16) return setErrorMsg("아이디는 4~16자로 입력해주세요.");
+        if (pw.length < 6 || pw.length > 32) return setErrorMsg("비밀번호는 6~32자로 입력해주세요.");
+        if (pw !== pwCheck) return setErrorMsg("비밀번호가 일치하지 않습니다.");
+        if (name.length < 1) return setErrorMsg("이름을 입력해주세요.");
+        if (nick.length < 2 || nick.length > 16) return setErrorMsg("닉네임은 2~16자로 입력해주세요.");
+
+        // 2. 전송
+        axios.post(server + "auth/register",
+        {
+            userid: id,
+            userpw: pw,
+            username: name,
+            nickname: nick
+        })
+        .then((resp) => 
+        {
+            alert(resp.data);
+            window.location.href = '/';
+        })
+        .catch((error) => 
+        {
+            console.error(error);
+            setErrorMsg("서버 오류가 발생했습니다.");
+        });
     }
 
-    function checkPw() 
-    {
-        return pwRef.current.value === pwCheckRef.current.value
-    }
+    // function checkPw() // 비밀번호, 비밀번호 확인 체크용. 사용안됨
+    // {
+    //     return pwRef.current.value === pwCheckRef.current.value
+    // }
 
     return (
         <>
@@ -69,6 +86,8 @@ const Register = () => {
                                 <div class="text-red-600">패스워드가 일치하지 않습니다.</div>
                             </div> */}
 
+
+
                             <div class="form-floating my-2">
                                 <input type="text" ref={nameRef} class="form-control" id="name" placeholder="이름" minlength="1" maxlength="16" />
                                 <label for="name">이름</label>
@@ -78,6 +97,12 @@ const Register = () => {
                                 <input type="text" ref={nickNameRef} class="form-control" id="nickname" placeholder="닉네임" minlength="2" maxlength="16" />
                                 <label for="nickname">닉네임</label>
                             </div>
+
+                            {errorMsg && (
+                                <div class="w-full text-sm md:text-md ml-2 my-2 font-bold">
+                                    <div class="text-red-600">{errorMsg}</div>
+                                </div>
+                            )}
 
                             <div class="w-full text-sm md:text-md ml-2 my-2 font-bold">
                                 <div class="py-2.5"></div>
