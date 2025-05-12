@@ -1,8 +1,8 @@
+import { Link } from "react-router-dom"
 import React from 'react'
 import '../../static/css/Header.css';
 import logo from '../../static/image/test/header/logo.png';
 
-import { Link } from 'react-router-dom';
 import { FiUser, FiHeart, FiLogIn, FiLogOut } from "react-icons/fi";
 
 const Header = () => 
@@ -38,35 +38,26 @@ const Header = () =>
                                     localStorage.removeItem("nickname");
                                     window.location.href = "/";
                                 }} />
+                                <FiHeart />
+                                {/* 출석체크 버튼 - 이제 별도 페이지로 이동합니다 */}
+                                <Link to="/attendance/check" className="ml-4">
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">출석체크</button>
+                                </Link>
                             </>
                         ) 
                         : (
                             <>
                                 <Link to="/login"><FiLogIn /></Link>   {/* 로그인 */}
                                 <Link to="/register"><FiUser /></Link> {/* 회원가입 */}
+                                <FiHeart />
                             </>
                         )
                     }
-                    <FiHeart /> {/* 최근 본 상품은 로그인 여부와 무관하게 항상 보여줌 */}
+                    {/* <FiHeart /> 최근 본 상품은 로그인 여부와 무관하게 항상 보여줌 사용성을 위해 따로 */}
                     </div>
                 {/* 퀵메뉴 끝 */}
             </div>
-            <button
-  onClick={() => {
-    const token = localStorage.getItem("token");
 
-    fetch("http://localhost:8080/attendance/check", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    })
-      .then((res) => res.text())
-      .then((msg) => alert(msg))
-      .catch((err) => console.error(err));
-  }}
-    >출석 체크</button>
         </header>
         
     )

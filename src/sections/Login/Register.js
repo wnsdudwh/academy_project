@@ -13,6 +13,35 @@ const Register = () =>
 
     const [errorMsg, setErrorMsg] = useState("");   //에러 메세지 상태
 
+    const [nickname, setNickname] = useState("");   //닉네임 상태 리셋
+    const [nicknameMsg, setNicknameMsg] = useState("");     //  닉네임 중복 상태감지 메세지ㅣ
+    const [isNickAvailable, setIsNickAvailable] = useState(true);   //  닉네임 중복 상태감지
+
+    const handleCheckNickname = async () => 
+    {
+        if (!nickname.trim()) return setNicknameMsg("닉네임을 입력해주세요.");
+    
+        try 
+        {
+            const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/check-nickname?nickname=${nickname}`);
+            if (resp.data === true) 
+            {
+                setNicknameMsg("사용 가능한 닉네임입니다.");
+                setIsNickAvailable(true);
+            } 
+            else 
+            {
+                setNicknameMsg("이미 사용 중인 닉네임입니다.");
+                setIsNickAvailable(false);
+            }
+        } 
+        catch (err) 
+        {
+            setNicknameMsg("서버 에러 발생");
+            console.error(err);
+        }
+    };
+
     const handleSubmit = (e) => 
     {
         e.preventDefault();
@@ -30,6 +59,7 @@ const Register = () =>
         if (pw !== pwCheck) return setErrorMsg("비밀번호가 일치하지 않습니다.");
         if (name.length < 1) return setErrorMsg("이름을 입력해주세요.");
         if (nick.length < 2 || nick.length > 16) return setErrorMsg("닉네임은 2~16자로 입력해주세요.");
+        if (!isNickAvailable) return setErrorMsg("닉네임 중복 확인을 해주세요.");   //닉네임 중복 감지. 별도로 빼서 주석해둠.
 
         // 2. 전송
         axios.post(server + "auth/register",
@@ -86,16 +116,35 @@ const Register = () =>
                                 <div class="text-red-600">패스워드가 일치하지 않습니다.</div>
                             </div> */}
 
-
-
                             <div class="form-floating my-2">
                                 <input type="text" ref={nameRef} class="form-control" id="name" placeholder="이름" minlength="1" maxlength="16" />
                                 <label for="name">이름</label>
                             </div>
 
-                            <div class="form-floating my-2">
-                                <input type="text" ref={nickNameRef} class="form-control" id="nickname" placeholder="닉네임" minlength="2" maxlength="16" />
-                                <label for="nickname">닉네임</label>
+                            <div className="form-floating my-2 relative">
+                                <input type="text" ref={nickNameRef} className="form-control" id="nickname" placeholder="닉네임" minLength="2" maxLength="16"
+                                    value={nickname} onChange={(e) => setNickname(e.target.value)}/>
+                                <label htmlFor="nickname">닉네임</label>
+
+                                {/* ✅ 중복 확인 버튼 */}
+                                <button type="button" className="absolute right-2 top-2 text-sm text-white bg-blue-400 rounded px-2 py-1" onClick={handleCheckNickname}>
+                                    중복 확인
+                                </button>
+
+                                {/* ✅ 결과 메시지 */}
+                                {nicknameMsg && (
+                                    <div className="text-sm mt-1 text-red-500">{nicknameMsg}</div>
+                                )}
+                                </div>
+
+                            {nicknameMsg && (
+                                <div className="text-sm mt-1" style={{ color: isNickAvailable ? "green" : "red" }}>
+                                    {nicknameMsg}
+                                </div>
+                            )}
+
+                            <div class="w-full text-sm md:text-md ml-2 my-2 font-bold">
+                                <div class="py-2.5"></div>
                             </div>
 
                             {errorMsg && (
@@ -103,14 +152,10 @@ const Register = () =>
                                     <div class="text-red-600">{errorMsg}</div>
                                 </div>
                             )}
-
-                            <div class="w-full text-sm md:text-md ml-2 my-2 font-bold">
-                                <div class="py-2.5"></div>
-                            </div>
                             
                             <button class="w-full py-2 mt-2 bg-primary-400 rounded-md" type="button" onClick={handleSubmit}>회원가입</button>
                         </div>
-                        <p class="mt-5 mb-3 text-body-secondary">© 2025 wwd</p>
+                        <p class="mt-5 mb-3 text-body-secondary">© 2025 ㅈㅈㅇ</p>
                     </main>
                 </div>
             </div>

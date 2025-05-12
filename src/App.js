@@ -8,11 +8,13 @@ import Main from "./sections/Main/Main.js";
 import Register from './sections/Login/Register.js';
 import Login from "./sections/Login/Login.js";
 
+import AttendanceCheck from "./component/mypage/attendance-check.jsx";
 
-function App() {
-
+function App() 
+{
   // Aos 초기화
-  useEffect(() => {
+  useEffect(() => 
+  {
     Aos.init({});
   }, [])
 
@@ -20,14 +22,12 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          {/* <Route path="/login" element={<Login />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/attendance/check" element={<AttendanceCheck />} />
           <Route path="/" element={<Main />} />
         </Routes>
       </BrowserRouter>
-
-
 
     </>
   );

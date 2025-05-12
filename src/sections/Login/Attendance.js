@@ -18,8 +18,7 @@ const Attendance = () =>
       .catch((err) => console.error(err));
   }}
 >
-  출석 체크
-</button>
+  출석 체크</button>
 
     );
 

@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom"
 import LoginFooter from '../../sections/Login/LoginFooter'
 import LoginHeader from '../../sections/Login/LoginHeader'
 
+import SocialLogin from "./SnsLogin"
+
 import '../../static/css/boardLogin.css'
 
 const Login = () => 
@@ -67,14 +69,11 @@ const Login = () =>
                         <div>
                             <button type="submit" class="loginSubmit">로그인</button>
                         </div>
-                        <div class="n-login__btn-wrap login-sns">
-                            <button type="button" onclick="javascript(0)" class="c-btn--round n-login__btn--kakao">
-                                <span>카카오 로그인</span>
-                            </button>
-                            <button type="button" onclick="javascript(0)" class="c-btn--round n-login__btn--naveri">
-                                <span>네이버 로그인</span>
-                            </button>
-                        </div>
+                        <>
+                            <div>
+                                <SocialLogin />
+                            </div>
+                        </>
                     </form>
                 </div>
             </div>
