@@ -4,11 +4,6 @@ export default function SocialLogin() {
   return (
     <div className="w-full max-w-md mx-auto mt-6">
       {/* Divider with "Or" text */}
-      <div className="relative flex items-center py-5">
-        <div className="flex-grow border-t border-gray-300"></div>
-        <span className="flex-shrink mx-4 text-gray-600">Or</span>
-        <div className="flex-grow border-t border-gray-300"></div>
-      </div>
 
       {/* Social Login Buttons */}
       <div className="flex flex-col space-y-3">
