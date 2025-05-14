@@ -9,7 +9,7 @@ import Register from './sections/Login/Register.js';
 import Login from "./sections/Login/Login.js";
 
 import AttendanceCheck from "./component/mypage/attendance-check.jsx";
-import MyPage from "./component/mypage/my-page.tsx"
+import MyPage from "./component/mypage/profile-edit.js"
 
 function App() 
 {

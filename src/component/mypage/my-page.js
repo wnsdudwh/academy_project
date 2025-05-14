@@ -1,9 +1,9 @@
 "use client"
-import React from "react"
 
 import { useEffect, useState } from "react"
 import axios from "axios"
-import {ShoppingBag,
+import {
+  ShoppingBag,
   Heart,
   Gift,
   CreditCard,
@@ -14,34 +14,17 @@ import {ShoppingBag,
   Bell,
   LogOut,
 } from "lucide-react"
-
-// 사용자 정보 타입 정의
-interface UserInfo 
-{
-  userId: string
-  nickname: string
-  regDate: string
-  point: number
-  profileImage?: string
-  level?: string
-  orderCount?: number
-  wishlistCount?: number
-  coupons?: number
-}
-
-// 메뉴 아이템 타입 정의
-interface MenuItem {
-  icon: React.ReactNode
-  title: string
-  value?: string | number
-  link: string
-  badge?: number
-}
+import OrderHistory from "./order-history"
+import ProfileEdit from "./profile-edit"
+import ShoppingAddressModal from "./shopping-address-modal"
 
 export default function MyPage() {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const [userInfo, setUserInfo] = useState(null)
   const [activeTab, setActiveTab] = useState("profile")
   const [isLoading, setIsLoading] = useState(true)
+  const [showAddressModal, setShowAddressModal] = useState(false)
+  const [addresses, setAddresses] = useState([])
+  const [defaultAddressId, setDefaultAddressId] = useState(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -66,6 +49,21 @@ export default function MyPage() {
         }
 
         setUserInfo(enhancedData)
+
+        // 임시 배송지 데이터
+        setAddresses([
+          {
+            id: "addr1",
+            name: "집",
+            recipient: "홍길동",
+            phone: "010-1234-5678",
+            zipcode: "06134",
+            address1: "서울특별시 강남구 테헤란로 427",
+            address2: "위워크 타워 10층",
+            isDefault: true,
+          },
+        ])
+        setDefaultAddressId("addr1")
       } catch (error) {
         console.error("사용자 정보를 불러오는 중 오류가 발생했습니다:", error)
       } finally {
@@ -77,13 +75,14 @@ export default function MyPage() {
   }, [])
 
   // 메뉴 아이템 정의
-  const menuItems: MenuItem[] = userInfo
+  const menuItems = userInfo
     ? [
         {
           icon: <ShoppingBag className="w-5 h-5" />,
           title: "주문 내역",
           value: `${userInfo.orderCount}건`,
-          link: "/orders",
+          link: "#",
+          onClick: () => setActiveTab("order-history"),
         },
         {
           icon: <Heart className="w-5 h-5" />,
@@ -106,7 +105,8 @@ export default function MyPage() {
         {
           icon: <MapPin className="w-5 h-5" />,
           title: "배송지 관리",
-          link: "/addresses",
+          link: "#",
+          onClick: () => setActiveTab("profile-edit"),
         },
         {
           icon: <Calendar className="w-5 h-5" />,
@@ -122,13 +122,64 @@ export default function MyPage() {
         {
           icon: <Settings className="w-5 h-5" />,
           title: "계정 설정",
-          link: "/settings",
+          link: "#",
+          onClick: () => setActiveTab("profile-edit"),
         },
       ]
     : []
 
-  if (isLoading) 
-  {
+  const handleAddAddress = (newAddress) => {
+    const newId = `addr${addresses.length + 1}`
+    const addressWithId = { ...newAddress, id: newId }
+
+    // 새 주소가 기본 배송지로 설정된 경우 다른 주소들의 기본 배송지 설정 해제
+    if (newAddress.isDefault) {
+      setAddresses(addresses.map((addr) => ({ ...addr, isDefault: false })).concat(addressWithId))
+      setDefaultAddressId(newId)
+    } else {
+      setAddresses([...addresses, addressWithId])
+    }
+
+    setShowAddressModal(false)
+  }
+
+  const handleUpdateAddress = (updatedAddress) => {
+    // 업데이트된 주소가 기본 배송지로 설정된 경우 다른 주소들의 기본 배송지 설정 해제
+    if (updatedAddress.isDefault) {
+      setAddresses(
+        addresses.map((addr) => (addr.id === updatedAddress.id ? updatedAddress : { ...addr, isDefault: false })),
+      )
+      setDefaultAddressId(updatedAddress.id)
+    } else {
+      setAddresses(addresses.map((addr) => (addr.id === updatedAddress.id ? updatedAddress : addr)))
+
+      // 만약 기본 배송지가 업데이트되었고 더 이상 기본 배송지가 아니라면 기본 배송지 ID 초기화
+      if (defaultAddressId === updatedAddress.id) {
+        setDefaultAddressId(null)
+      }
+    }
+  }
+
+  const handleDeleteAddress = (addressId) => {
+    setAddresses(addresses.filter((addr) => addr.id !== addressId))
+
+    // 만약 기본 배송지가 삭제되었다면 기본 배송지 ID 초기화
+    if (defaultAddressId === addressId) {
+      setDefaultAddressId(null)
+    }
+  }
+
+  const handleSetDefaultAddress = (addressId) => {
+    setAddresses(
+      addresses.map((addr) => ({
+        ...addr,
+        isDefault: addr.id === addressId,
+      })),
+    )
+    setDefaultAddressId(addressId)
+  }
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-pulse flex flex-col items-center">
@@ -138,7 +189,7 @@ export default function MyPage() {
         </div>
       </div>
     )
-}
+  }
 
   if (!userInfo) {
     return (
@@ -146,11 +197,34 @@ export default function MyPage() {
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">로그인이 필요합니다</h2>
           <p className="text-gray-500 mb-4">마이페이지를 이용하려면 로그인해주세요.</p>
-          <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors" onClick={() => (window.location.href = "/login")}>
-              로그인하기
+          <button
+            className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+            onClick={() => (window.location.href = "/login")}
+          >
+            로그인하기
           </button>
         </div>
       </div>
+    )
+  }
+
+  // 활성 탭에 따라 다른 컴포넌트 렌더링
+  if (activeTab === "order-history") {
+    return <OrderHistory onBack={() => setActiveTab("profile")} />
+  }
+
+  if (activeTab === "profile-edit") {
+    return (
+      <ProfileEdit
+        userInfo={userInfo}
+        onBack={() => setActiveTab("profile")}
+        addresses={addresses}
+        defaultAddressId={defaultAddressId}
+        onAddAddress={() => setShowAddressModal(true)}
+        onUpdateAddress={handleUpdateAddress}
+        onDeleteAddress={handleDeleteAddress}
+        onSetDefaultAddress={handleSetDefaultAddress}
+      />
     )
   }
 
@@ -165,7 +239,11 @@ export default function MyPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="relative">
-            <img src={userInfo.profileImage || "/placeholder.svg"} alt="프로필 이미지" className="w-24 h-24 rounded-full object-cover border-2 border-gray-200" />
+            <img
+              src={userInfo.profileImage || "/placeholder.svg"}
+              alt="프로필 이미지"
+              className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+            />
             <span className="absolute bottom-0 right-0 bg-yellow-400 text-xs font-medium px-2 py-1 rounded-full">
               {userInfo.level}
             </span>
@@ -176,7 +254,10 @@ export default function MyPage() {
             <p className="text-gray-500 text-sm mb-3">가입일: {new Date(userInfo.regDate).toLocaleDateString()}</p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
-              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+              <button
+                className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                onClick={() => setActiveTab("profile-edit")}
+              >
                 프로필 수정
               </button>
               <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center gap-1">
@@ -203,7 +284,14 @@ export default function MyPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">최근 주문 내역</h3>
-          <a href="/orders" className="text-sm text-gray-500 hover:text-black flex items-center">
+          <a
+            href="#"
+            className="text-sm text-gray-500 hover:text-black flex items-center"
+            onClick={(e) => {
+              e.preventDefault()
+              setActiveTab("order-history")
+            }}
+          >
             전체보기 <ChevronRight className="w-4 h-4 ml-1" />
           </a>
         </div>
@@ -241,6 +329,12 @@ export default function MyPage() {
             key={index}
             href={item.link}
             className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative"
+            onClick={(e) => {
+              if (item.onClick) {
+                e.preventDefault()
+                item.onClick()
+              }
+            }}
           >
             <div className="flex items-center gap-4">
               <div className="bg-gray-50 p-3 rounded-lg">{item.icon}</div>
@@ -258,40 +352,14 @@ export default function MyPage() {
         ))}
       </div>
 
-      {/* 출석체크 모달 (실제로는 별도 컴포넌트로 분리하는 것이 좋습니다) */}
-      <div className="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">출석체크</h3>
-            <button className="text-gray-400 hover:text-gray-600">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="grid grid-cols-7 gap-2 mb-4">
-            {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-              <div
-                key={day}
-                className={`h-10 flex items-center justify-center rounded-md text-sm
-                  ${day <= 15 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-400"}`}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-gray-500 mb-4">이번 달 출석일: 15일</p>
-            <button className="w-full py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors">
-              오늘 출석하기
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* 배송지 추가 모달 */}
+      {showAddressModal && (
+        <ShoppingAddressModal
+          onClose={() => setShowAddressModal(false)}
+          onSave={handleAddAddress}
+          existingAddresses={addresses}
+        />
+      )}
     </div>
   )
 }

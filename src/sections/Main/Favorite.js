@@ -187,23 +187,6 @@ const Favorite = () => {
           </button>
         </div>
 
-        {/* 배경 장식 요소 */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-10 pointer-events-none">
-          <svg
-            className="absolute top-0 left-0 transform -translate-x-1/2"
-            width="404"
-            height="784"
-            fill="none"
-            viewBox="0 0 404 784"
-          >
-            <defs>
-              <pattern id="pattern-squares" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <rect x="0" y="0" width="4" height="4" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="404" height="784" fill="url(#pattern-squares)" />
-          </svg>
-        </div>
       </div>
     </div>
   )

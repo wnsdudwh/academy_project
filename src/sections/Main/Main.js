@@ -17,7 +17,7 @@ import mainImg4 from '../../static/image/test/main/44.jpg';
 import mainImg5 from '../../static/image/test/main/55.jpg';
 import mainImg6 from '../../static/image/test/main/66.jpg';
 import Header from '../Common/Header';
-import Navvar from '../Common/Navvar';
+import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import Commodity from '../Main/Commodity';
 import Trending from '../Main/Trending';
@@ -29,7 +29,7 @@ const Main = () => {
     return (
         <>
             <Header />
-            <Navvar />
+            <Navbar />
 
             <main className="max-w-[1440px] w-full h-[400px] relative mx-auto my-10" id="main">
                 <div className="main-slider">
