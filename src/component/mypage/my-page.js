@@ -17,6 +17,7 @@ import {
 import OrderHistory from "./order-history"
 import ProfileEdit from "./profile-edit"
 import ShoppingAddressModal from "./shopping-address-modal"
+import { useNavigate } from "react-router-dom"
 
 export default function MyPage() {
   const [userInfo, setUserInfo] = useState(null)
@@ -169,7 +170,8 @@ export default function MyPage() {
     }
   }
 
-  const handleSetDefaultAddress = (addressId) => {
+  const handleSetDefaultAddress = (addressId) => 
+  {
     setAddresses(
       addresses.map((addr) => ({
         ...addr,
@@ -178,6 +180,15 @@ export default function MyPage() {
     )
     setDefaultAddressId(addressId)
   }
+
+  //버튼 클릭시 메인으로 보내기
+  const navigate = useNavigate();
+
+  const handleGoBack = () =>
+  {
+    navigate("/");  //메인으로 ㄱㄱ
+  }
+  
 
   if (isLoading) {
     return (
@@ -231,6 +242,14 @@ export default function MyPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* 헤더 섹션 */}
+      <div className="flex items-center mb-6">
+        <button className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors" onClick={handleGoBack}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left w-5 h-5" aria-hidden="true">
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+          </svg>
+        </button>
+      </div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-6">마이페이지</h1>
       </div>
@@ -254,11 +273,9 @@ export default function MyPage() {
             <p className="text-gray-500 text-sm mb-3">가입일: {new Date(userInfo.regDate).toLocaleDateString()}</p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
-              <button
-                className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
                 onClick={() => setActiveTab("profile-edit")}
-              >
-                프로필 수정
+              >프로필 수정
               </button>
               <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center gap-1">
                 <LogOut className="w-3.5 h-3.5" />

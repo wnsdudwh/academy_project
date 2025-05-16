@@ -1,6 +1,10 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Pagination, Autoplay } from "swiper/modules"
+import "swiper/css"
+import "swiper/css/pagination"
 import "../../static/css/Navbar.css"
 
 // 브랜드 데이터
@@ -157,16 +161,13 @@ const Navbar = () => {
   const [activeCategory, setActiveCategory] = useState("electric")
   const [isMobile, setIsMobile] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(0)
   const [isHamburgerActive, setIsHamburgerActive] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [activeSlideIndices, setActiveSlideIndices] = useState({})
   const submenuRef = useRef(null)
   const menuItemRefs = useRef({})
-  const slideIntervalRef = useRef(null)
   const submenuTimeoutRef = useRef(null)
-  const sliderRef = useRef(null)
-  const touchStartXRef = useRef(0)
-  const touchEndXRef = useRef(0)
+  const swiperRef = useRef(null)
 
   // 반응형 처리
   useEffect(() => {
@@ -192,30 +193,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // 슬라이드 자동 전환
-  useEffect(() => {
-    if (hoveredMenu) {
-      // 이전 인터벌 클리어
-      if (slideIntervalRef.current) {
-        clearInterval(slideIntervalRef.current)
-      }
-
-      // 새 인터벌 설정
-      slideIntervalRef.current = setInterval(() => {
-        const featuredItems = menuItems.find((item) => item.id === hoveredMenu)?.featured || []
-        if (featuredItems.length > 1) {
-          setCurrentSlide((prev) => (prev + 1) % featuredItems.length)
-        }
-      }, 3000)
-    }
-
-    return () => {
-      if (slideIntervalRef.current) {
-        clearInterval(slideIntervalRef.current)
-      }
-    }
-  }, [hoveredMenu, currentSlide])
-
   // 햄버거 메뉴 모달 토글
   const toggleHamburgerModal = () => {
     setIsHamburgerModalOpen(!isHamburgerModalOpen)
@@ -228,7 +205,6 @@ const Navbar = () => {
       clearTimeout(submenuTimeoutRef.current)
     }
     setHoveredMenu(menuId)
-    setCurrentSlide(0) // 슬라이드 초기화
   }
 
   // 메뉴 호버 아웃 핸들러
@@ -261,73 +237,6 @@ const Navbar = () => {
     setActiveCategory(categoryId)
   }
 
-  // 터치 이벤트 핸들러
-  const handleTouchStart = (e) => {
-    touchStartXRef.current = e.touches[0].clientX
-  }
-
-  const handleTouchMove = (e) => {
-    touchEndXRef.current = e.touches[0].clientX
-  }
-
-  const handleTouchEnd = (menuId) => {
-    const featuredItems = menuItems.find((item) => item.id === menuId)?.featured || []
-    if (featuredItems.length <= 1) return
-
-    const touchDiff = touchStartXRef.current - touchEndXRef.current
-
-    // 스와이프 방향에 따라 슬라이드 변경
-    if (touchDiff > 50) {
-      // 오른쪽에서 왼쪽으로 스와이프 (다음 슬라이드)
-      setCurrentSlide((prev) => (prev + 1) % featuredItems.length)
-    } else if (touchDiff < -50) {
-      // 왼쪽에서 오른쪽으로 스와이프 (이전 슬라이드)
-      setCurrentSlide((prev) => (prev === 0 ? featuredItems.length - 1 : prev - 1))
-    }
-  }
-
-  // 마우스 드래그 이벤트 핸들러
-  const handleMouseDown = (e) => {
-    touchStartXRef.current = e.clientX
-    if (sliderRef.current) {
-      sliderRef.current.style.cursor = "grabbing"
-    }
-
-    // 마우스 이벤트 리스너 추가
-    document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mouseup", handleMouseUp)
-  }
-
-  const handleMouseMove = (e) => {
-    touchEndXRef.current = e.clientX
-  }
-
-  const handleMouseUp = (e) => {
-    if (sliderRef.current) {
-      sliderRef.current.style.cursor = "grab"
-    }
-
-    // 마우스 이벤트 리스너 제거
-    document.removeEventListener("mousemove", handleMouseMove)
-    document.removeEventListener("mouseup", handleMouseUp)
-
-    if (hoveredMenu) {
-      const featuredItems = menuItems.find((item) => item.id === hoveredMenu)?.featured || []
-      if (featuredItems.length <= 1) return
-
-      const touchDiff = touchStartXRef.current - touchEndXRef.current
-
-      // 드래그 방향에 따라 슬라이드 변경
-      if (touchDiff > 50) {
-        // 오른쪽에서 왼쪽으로 드래그 (다음 슬라이드)
-        setCurrentSlide((prev) => (prev + 1) % featuredItems.length)
-      } else if (touchDiff < -50) {
-        // 왼쪽에서 오른쪽으로 드래그 (이전 슬라이드)
-        setCurrentSlide((prev) => (prev === 0 ? featuredItems.length - 1 : prev - 1))
-      }
-    }
-  }
-
   // 서브메뉴 렌더링 함수
   const renderSubmenu = (menuId) => {
     const menu = menuItems.find((item) => item.id === menuId)
@@ -343,25 +252,33 @@ const Navbar = () => {
         <div className="max-w-[1280px] mx-auto flex">
           {/* 왼쪽 이미지 영역 - 슬라이더 */}
           <div className="w-1/4 p-6 bg-amber-100 relative overflow-hidden">
-            <div
-              ref={sliderRef}
-              className="swiper-container h-full cursor-grab"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={() => handleTouchEnd(menuId)}
-              onMouseDown={handleMouseDown}
+            <Swiper
+              modules={[Pagination, Autoplay]}
+              spaceBetween={0}
+              slidesPerView={1}
+              loop={true}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+              }}
+              pagination={{
+                clickable: true,
+                type: "bullets",
+              }}
+              className="h-full"
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper
+              }}
+              onSlideChange={(swiper) => {
+                setActiveSlideIndices((prev) => ({
+                  ...prev,
+                  [menuId]: swiper.realIndex % featuredItems.length,
+                }))
+              }}
             >
-              <div className="swiper-wrapper relative h-full">
-                {featuredItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className="swiper-slide absolute inset-0"
-                    style={{
-                      opacity: index === currentSlide ? 1 : 0,
-                      visibility: index === currentSlide ? "visible" : "hidden",
-                      transition: "opacity 0.5s ease-in-out, visibility 0.5s ease-in-out",
-                    }}
-                  >
+              {featuredItems.map((item, index) => (
+                <SwiperSlide key={index}>
+                  <div className="h-full flex flex-col">
                     <div className="aspect-square bg-white rounded-lg overflow-hidden mb-3">
                       <img
                         src={item.image || "/placeholder.svg"}
@@ -373,27 +290,26 @@ const Navbar = () => {
                     <h3 className="font-medium text-gray-900 mb-1">{item.name}</h3>
                     <p className="text-sm text-gray-600">{item.description}</p>
                   </div>
-                ))}
-              </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
 
-              {/* 슬라이드 인디케이터 */}
-              {featuredItems.length > 1 && (
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-20">
-                  {featuredItems.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        index === currentSlide ? "bg-indigo-600 w-4" : "bg-gray-300"
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setCurrentSlide(index)
-                      }}
-                      aria-label={`슬라이드 ${index + 1}로 이동`}
-                    />
-                  ))}
-                </div>
-              )}
+            {/* 수동 인디케이터 추가 */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-20">
+              {featuredItems.map((_, index) => (
+                <button
+                  key={index}
+                  className={`transition-all duration-300 rounded-full ${
+                    activeSlideIndices[menuId] === index ? "bg-indigo-600 w-4 h-2" : "bg-gray-300 w-2 h-2"
+                  }`}
+                  onClick={() => {
+                    if (swiperRef.current) {
+                      swiperRef.current.slideToLoop(index)
+                    }
+                  }}
+                  aria-label={`슬라이드 ${index + 1}로 이동`}
+                />
+              ))}
             </div>
           </div>
 
@@ -616,46 +532,6 @@ const Navbar = () => {
                   <div className="col-span-4 mt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">세부 카테고리</h3>
                     <div className="grid grid-cols-5 gap-4">
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-2">고버우드</h4>
-                        <ul className="space-y-1">
-                          <li>
-                            <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                              헥스
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                              크래프터
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                              콜트
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-2">고버우드</h4>
-                        <ul className="space-y-1">
-                          <li>
-                            <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                              헥스
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                              크래프터
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                              콜트
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
                       <div>
                         <h4 className="font-medium text-gray-900 mb-2">고버우드</h4>
                         <ul className="space-y-1">

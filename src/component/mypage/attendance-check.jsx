@@ -11,6 +11,11 @@ const AttendanceCheck = () =>
 
   const navigate = useNavigate();
 
+  const handleGoBack = () =>
+  {
+    navigate("/");
+  }
+
   useEffect(() => 
   {
       const token = localStorage.getItem("token");
@@ -68,7 +73,8 @@ const AttendanceCheck = () =>
           },
         })
 
-        if (response.ok) {
+        if (response.ok) 
+        {
           const data = await response.json()
           setAttendanceDates(data.dates)
         }
@@ -83,44 +89,68 @@ const AttendanceCheck = () =>
   }, [currentDate])
 
   // 출석 체크 함수
-  const handleAttendanceCheck = () => {
+  const handleAttendanceCheck = async () => 
+  {
     const token = localStorage.getItem("token")
 
-    // 💛 비로그인 상태면 알림 띄우고 함수 종료
-    if (!token) {
-      alert("로그인 후 출석체크를 해 주세요.")
-      return
+    // 💛 비로그인 상태면 알림 띄우고 함수 종료 어떤 식으로든 나가게함.
+    if (!token) 
+    {
+      const confirmLogin = window.confirm("로그인 후 출석체크를 해 주세요. 로그인 하시겠습니까?");
+      if (confirmLogin) 
+      {
+        navigate("/login"); // 로그인 페이지로 이동
+      }
+      else 
+      {
+        navigate("/"); // 메인 페이지로 이동
+      }
+      return;
     }
 
-    // ✅ 로그인 상태일 때만 출석 체크 API 호출
-    fetch("http://localhost:8080/attendance/check", {
-      method: "POST",
+    try
+    {
+      // ✅ 출석 체크 API 호출
+      const response = await fetch("http://localhost:8080/attendance/check", 
+      {
+        method: "POST",
+        headers: 
+        {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      const message = await response.text();
+
+      // 여기서 모든 응답을 message로 받고 판단
+      alert(message); 
+
+      if (response.ok)
+      {
+        navigate("/");
+      }
+
+    // 출석 성공 또는 중복 후에도 달력 새로고침
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+
+    const listResponse = await fetch(`http://localhost:8080/attendance/list?year=${year}&month=${month}`, {
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
-      .then((res) => res.text())
-      .then((msg) => {
-        alert(msg)
+    });
 
-        // 출석 체크 후 데이터 다시 불러오기
-        const year = currentDate.getFullYear()
-        const month = currentDate.getMonth() + 1
-
-        fetch(`http://localhost:8080/attendance/list?year=${year}&month=${month}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => setAttendanceDates(data.dates))
-          .catch((err) => console.error(err))
-      })
-      .catch((err) => {
-        console.error(err)
-        alert("출석 실패")
-      })
+    if (listResponse.ok) {
+      const data = await listResponse.json();
+      setAttendanceDates(data.dates);
+    }
+  }
+  catch (error)
+  {
+    console.error("완전한 서버 연결 실패 또는 CORS 등 네트워크 문제", error);
+      // 진짜 네트워크 예외만 처리
+    alert("서버와의 연결 중 오류가 발생했습니다.")
+  }
   }
 
   // 달력 생성 함수
@@ -207,6 +237,12 @@ const AttendanceCheck = () =>
   return (
     <div className="max-w-md mx-auto my-8">
       <style>{animationStyle}</style>
+      <button className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors mb-4" onClick={handleGoBack}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left w-5 h-5" aria-hidden="true">
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+          </svg>
+        </button>
       <div className="border rounded-lg overflow-hidden shadow-md">
         {/* 달력 헤더 */}
         <div className="bg-gray-100 p-4 flex items-center justify-between border-b" id="attend_calendarhead">

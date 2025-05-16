@@ -124,10 +124,7 @@ const Header = () => {
               </button>
 
               {/* 출석체크 버튼 - 로그인 시에만 표시 */}
-              <a
-                href="/attendance"
-                className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md"
-              >
+              <a href="/attendance/check" className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md">
                 출석체크
               </a>
             </>
