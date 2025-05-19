@@ -28,7 +28,7 @@ function App()
           <Route path="/register" element={<Register />} />
           <Route path="/attendance/check" element={<AttendanceCheck />} />
           <Route path="/mypage" element={<MyPage />} />
-          <Route path="/mypage/edit" element={<MyPage />} />
+          <Route path="/mypage/edit" element={<MyPageEdit />} />
           <Route path="/" element={<Main />} />
         </Routes>
       </BrowserRouter>

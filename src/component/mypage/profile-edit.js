@@ -5,19 +5,32 @@ import { ArrowLeft, Plus, Eye, EyeOff } from "lucide-react"
 import ShoppingAddressModal from "./shopping-address-modal"
 import axios from "axios"
 
-export default function ProfileEdit({
-  userInfo,
+import { useLocation, useNavigate } from "react-router-dom";
+
+export default function ProfileEdit ({
+  userInfo: propUserInfo,
   onBack,
-  addresses,
-  defaultAddressId,
+  addresses: propAddresses,
+  defaultAddressId: propDefaultAddressId,
   onAddAddress,
   onUpdateAddress,
   onDeleteAddress,
   onSetDefaultAddress,
-}) 
-{
+}) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const userInfo = propUserInfo || location.state?.userInfo;
+  const addresses = propAddresses || location.state?.addresses || [];
+  const defaultAddressId = propDefaultAddressId || location.state?.defaultAddressId || null;
+
+  // 이후에 기존 코드 이어서 사용
+
   // 가져 온 값을 수정 할 때
   const [nickname, setNickname] = useState("");
+  // 📱 휴대폰 번호 입력 상태
+  const [phone, setPhone] = useState(userInfo?.phone || "");
+    // 💬 닉네임 중복 상태 메시지
   const [nicknameCheckMsg, setNicknameCheckMsg] = useState("");
   const [isNicknameAvailable, setIsNicknameAvailable] = useState(null);
 
@@ -29,6 +42,12 @@ export default function ProfileEdit({
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const handleBack = () =>
+  {
+    //이전페이지로 navigate를 이용해서 보내버림
+    navigate(-1);
+  }
 
   const handleEditAddress = (address) => 
   {
@@ -49,6 +68,20 @@ export default function ProfileEdit({
 // 닉네임 변경 제출 함수
 const handleSubmitNickname = async () => 
 {
+  // 중복 확인 안 한 경우
+  if (isNicknameAvailable === null)
+    {
+      alert("닉네임 중복 확인을 먼저 해주세요.");
+      return;
+    }
+  
+    // 중복된 닉네임이면 저장 불가
+    if (!isNicknameAvailable)
+    {
+      alert("이미 사용 중인 닉네임입니다.");
+      return;
+    }
+
     try 
     {
       const token = localStorage.getItem("token"); // 🔐 로컬 스토리지에서 토큰 꺼냄
@@ -75,7 +108,7 @@ const handleSubmitNickname = async () =>
     }
 };
 
-//중복 확인 핸들러
+// 닉네임 중복 확인 핸들러
 const handleNicknameCheck = async () =>
 {
   if (!nickname)
@@ -83,6 +116,7 @@ const handleNicknameCheck = async () =>
     return setNicknameCheckMsg("닉네임을 입력 해 주세요.")
   }
 
+  // 중복 아니고 확인도 했으면 PATCH 요청
   try 
   {
     const response = await axios.get(`http://localhost:8080/auth/check-nickname?nickname=${nickname}`);
@@ -102,12 +136,77 @@ const handleNicknameCheck = async () =>
   catch (error) 
   {
     console.error(error);
-    setNicknameCheckMsg("오류 발생!!");    
+    setNicknameCheckMsg("닉네임 변경 오류 발생!!");    
   }
 
 }
-  
-  // 
+  // 📤 휴대폰 번호 저장 처리 함수
+  const handlePhoneSave = async () =>
+  {
+    // 1. 유효성 검사 (공통)
+    if (!phone.trim())
+    {
+      alert("휴대폰 번호를 입력 해 주세요.")
+      return;
+    }
+
+    // 2. 형식 검사
+    const regex = /^01[0-9]-\d{3,4}-\d{4}$/;
+    if (!regex.test(phone))
+    {
+      alert("휴대폰 번호 형식이 올바르지 않습니다. (예: 010-1234-5678)");
+      return;
+    }
+
+    try 
+    {
+      const token = localStorage.getItem("token");
+
+      // 3. 서버에 저장 요청
+      const response = await axios.put("http://localhost:8080/auth/mypage/update-phone",
+      {
+        phone : phone
+      },
+      {
+        headers : 
+        {
+          Authorization : `Bearer ${token}`
+        }
+      });
+      alert("연락처가 성공적으로 변경되었습니다!");
+      window.location.reload();  // 🔄 변경된 값 즉시 반영을 위해 새로고침
+      setActiveSection("all-info"); // 📋 다시 전체 정보 페이지로 전환
+    }
+    catch (error)
+    {
+      console.error(error);
+      alert("휴대폰 번호 저장에 실패했습니다.");
+    }
+  }
+
+  const handlePhoneChange = (e) =>
+    {
+      const value = e.target.value;
+    
+      // 숫자만 추출하고 11자리까지만 제한
+      const onlyNums = value.replace(/[^0-9]/g, '').slice(0, 11);
+    
+      let formatted = onlyNums;
+    
+      // 11자리면 010-1234-5678 형식
+      if (onlyNums.length === 11)
+      {
+        formatted = onlyNums.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+      }
+      // 10자리면 010-123-4567 형식
+      else if (onlyNums.length === 10)
+      {
+        formatted = onlyNums.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+      }
+    
+      setPhone(formatted);
+    }
+    
 
   // 각 섹션으로 이동하는 함수
   const navigateToSection = (section) => {
@@ -180,12 +279,12 @@ const handleNicknameCheck = async () =>
           </div>
         </div>
 
-        {/* 연락처 정보 (보기만 가능) */}
+        {/* 연락처 정보 (보기만 가능)휴대폰 번호 */}
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex justify-between items-center">
             <div>
               <p className="font-medium">연락처</p>
-              <p className="text-gray-600 mt-1">{userInfo.phone || "등록된 연락처가 없습니다"}</p>
+              <p className="text-gray-600 mt-1">{userInfo?.phone || "등록된 연락처가 없습니다"}</p>
             </div>
             <button
               className="text-sm px-3 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-md transition-colors"
@@ -273,7 +372,7 @@ const handleNicknameCheck = async () =>
             <label htmlFor="new-nickname" className="block text-sm font-medium text-gray-700 mb-1">
               새 닉네임
             </label>
-            <input id="new-nickname" type="text" placeholder="새 닉네임을 입력하세요" value={nickname} onChange={(e) => setNickname(e.target.value)}
+          <input id="new-nickname" type="text" placeholder="새 닉네임을 입력하세요" value={nickname} onChange={(e) => {setNickname(e.target.value); setIsNicknameAvailable(null); setNicknameCheckMsg("")}}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"/>
                 <button type="button" onClick={handleNicknameCheck} className="px-3 py-1 bg-blue-500 text-white rounded-md">중복 확인</button>
           </div>
@@ -305,21 +404,13 @@ const handleNicknameCheck = async () =>
         <h2 className="text-xl font-semibold">비밀번호 변경</h2>
         <div className="space-y-4 p-6 bg-gray-50 rounded-lg">
           <div>
-            <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-1">
-              현재 비밀번호
-            </label>
+            <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-1">현재 비밀번호</label>
             <div className="relative">
-              <input
-                id="current-password"
-                type={showCurrentPassword ? "text" : "password"}
+              <input id="current-password" type={showCurrentPassword ? "text" : "password"}
                 placeholder="현재 비밀번호를 입력하세요"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-              >
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}> 
                 {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -367,12 +458,8 @@ const handleNicknameCheck = async () =>
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
-            onClick={() => setActiveSection("all-info")}
-          >
-            취소
-          </button>
+          <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+            onClick={() => setActiveSection("all-info")}>취소</button>
           <button className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-md transition-colors">
             저장하기
           </button>
@@ -391,37 +478,27 @@ const handleNicknameCheck = async () =>
             <label htmlFor="current-phone" className="block text-sm font-medium text-gray-700 mb-1">
               현재 연락처
             </label>
-            <input
-              id="current-phone"
-              type="text"
-              value={userInfo.phone || "등록된 연락처가 없습니다"}
-              disabled
+            {/* ✅ 현재 연락처 (읽기 전용, userInfo에서 가져옴) */}
+            <input id="current-phone" type="text" value={userInfo?.phone || "등록된 연락처가 없습니다"} disabled
               className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md"
             />
           </div>
           <div>
+            {/* ✅ 새 연락처 (사용자 입력값, 상태변수 phone 사용) */}
             <label htmlFor="new-phone" className="block text-sm font-medium text-gray-700 mb-1">
               새 연락처
             </label>
-            <input
-              id="new-phone"
-              type="tel"
-              placeholder="새 연락처를 입력하세요"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
+            <input id="new-phone" type="tel" placeholder="(010-1234-5678) 형식으로 입력 해 주세요." value={phone} onChange={handlePhoneChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500" />
           </div>
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
-            onClick={() => setActiveSection("all-info")}
-          >
-            취소
-          </button>
-          <button className="px-4 py-2 bg-amber-600 text-white hover:bg-amber-700 rounded-md transition-colors">
-            저장하기
-          </button>
+          <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+            onClick={() => setActiveSection("all-info")}>취소</button>
+
+          <button className="px-4 py-2 bg-amber-600 text-white hover:bg-amber-700 rounded-md transition-colors"
+            onClick={handlePhoneSave}>저장하기</button>
         </div>
       </div>
     )
@@ -510,7 +587,7 @@ const handleNicknameCheck = async () =>
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <div className="flex items-center mb-6">
-        <button className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors" onClick={onBack}>
+        <button className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors" onClick={handleBack}>
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">내 정보 관리</h1>

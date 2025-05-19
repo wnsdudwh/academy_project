@@ -273,9 +273,9 @@ export default function MyPage() {
             <p className="text-gray-500 text-sm mb-3">가입일: {new Date(userInfo.regDate).toLocaleDateString()}</p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
+              {/* <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" onClick={() => setActiveTab("profile-edit")}>프로필 수정 */}
               <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                onClick={() => setActiveTab("profile-edit")}
-              >프로필 수정
+                onClick={() => navigate("edit", { state : { userInfo, addresses, defaultAddressId } })}>프로필 수정
               </button>
               <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center gap-1">
                 <LogOut className="w-3.5 h-3.5" />
