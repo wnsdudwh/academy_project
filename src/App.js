@@ -12,6 +12,8 @@ import AttendanceCheck from "./component/mypage/attendance-check.jsx";
 import MyPage from "./component/mypage/my-page.js"
 import MyPageEdit from "./component/mypage/profile-edit.js"
 
+import ProductList from "./sections/Product/ProductList.js"
+
 function App() 
 {
   // Aos 초기화
@@ -24,12 +26,13 @@ function App()
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Main />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/attendance/check" element={<AttendanceCheck />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/mypage/edit" element={<MyPageEdit />} />
-          <Route path="/" element={<Main />} />
+          <Route path="/product" element={<ProductList />} />
         </Routes>
       </BrowserRouter>
 
