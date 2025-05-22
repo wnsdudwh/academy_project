@@ -41,7 +41,7 @@ const Header = () => {
       }`}
       id="header"
     >
-      <div className="header max-w-[1280px] w-full h-full mx-auto flex flex-row justify-between items-center px-4">
+      <div className="header max-w-[1440px] w-full h-full mx-auto flex flex-row justify-between items-center px-6">
         {/* 로고 영역 */}
         <div className="logo-zone basis-1/4">
           <a href="/">
@@ -124,7 +124,10 @@ const Header = () => {
               </button>
 
               {/* 출석체크 버튼 - 로그인 시에만 표시 */}
-              <a href="/attendance/check" className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md">
+              <a
+                href="/attendance/check"
+                className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md"
+              >
                 출석체크
               </a>
             </>

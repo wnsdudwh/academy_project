@@ -10,12 +10,12 @@ import 'swiper/css/effect-fade';
 // import 'swiper/css/scrollbar';
 
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
-import mainImg1 from '../../static/image/test/main/11.jpg';
-import mainImg2 from '../../static/image/test/main/22.jpg';
-import mainImg3 from '../../static/image/test/main/33.jpg';
-import mainImg4 from '../../static/image/test/main/44.jpg';
-import mainImg5 from '../../static/image/test/main/55.jpg';
-import mainImg6 from '../../static/image/test/main/66.jpg';
+import mainImg1 from '../../static/image/Main/temp_main_20250522_01.png';
+import mainImg2 from '../../static/image/Main/temp_main_20250522_02.png';
+import mainImg3 from '../../static/image/Main/temp_main_20250522_03.png';
+import mainImg4 from '../../static/image/Main/temp_main_20250522_04.png';
+import mainImg5 from '../../static/image/Main/temp_main_20250522_05.png';
+import mainImg6 from '../../static/image/Main/temp_main_20250522_06.png';
 import Header from '../Common/Header';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
@@ -34,7 +34,7 @@ const Main = () => {
             <main className="max-w-[1440px] w-full h-[400px] relative mx-auto my-10" id="main">
                 <div className="main-slider">
                     <Swiper pagination={{ dynamicBullets: true, }} modules={[Pagination, Autoplay, EffectFade]} loop={true}
-                        autoplay={{ delay: 2500, disableOnInteraction: false, }} effect={'fade'} spaceBetween={30}
+                        autoplay={{ delay: 5000, disableOnInteraction: false, }} effect={'fade'} spaceBetween={30}
                         className="mySwiper max-h-[400px] rounded-3xl">
                         <SwiperSlide>
                             <div className="image1">

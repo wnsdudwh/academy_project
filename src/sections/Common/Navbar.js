@@ -168,6 +168,7 @@ const Navbar = () => {
   const menuItemRefs = useRef({})
   const submenuTimeoutRef = useRef(null)
   const swiperRef = useRef(null)
+  const hamburgerRef = useRef(null)
 
   // 반응형 처리
   useEffect(() => {
@@ -205,6 +206,8 @@ const Navbar = () => {
       clearTimeout(submenuTimeoutRef.current)
     }
     setHoveredMenu(menuId)
+    // 서브메뉴 열릴 때 햄버거 아이콘 활성화
+    setIsHamburgerActive(true)
   }
 
   // 메뉴 호버 아웃 핸들러
@@ -214,6 +217,10 @@ const Navbar = () => {
       // 서브메뉴에 마우스가 있는지 확인
       if (!submenuRef.current || !submenuRef.current.matches(":hover")) {
         setHoveredMenu(null)
+        // 서브메뉴 닫힐 때 햄버거 아이콘 비활성화 (모달이 열려있지 않은 경우에만)
+        if (!isHamburgerModalOpen) {
+          setIsHamburgerActive(false)
+        }
       }
     }, 100)
   }
@@ -227,6 +234,10 @@ const Navbar = () => {
 
   const handleSubmenuMouseLeave = () => {
     setHoveredMenu(null)
+    // 서브메뉴 닫힐 때 햄버거 아이콘 비활성화 (모달이 열려있지 않은 경우에만)
+    if (!isHamburgerModalOpen) {
+      setIsHamburgerActive(false)
+    }
   }
 
   // 모바일 메뉴 토글
@@ -245,11 +256,11 @@ const Navbar = () => {
     return (
       <div
         ref={submenuRef}
-        className="absolute left-0 right-0 top-full bg-white shadow-lg z-20 border-t border-gray-200 animate-fadeIn"
+        className="absolute left-0 right-0 top-full bg-white shadow-lg z-50 border-t border-gray-200 animate-fadeIn"
         onMouseEnter={handleSubmenuMouseEnter}
         onMouseLeave={handleSubmenuMouseLeave}
       >
-        <div className="max-w-[1280px] mx-auto flex">
+        <div className="max-w-[1440px] mx-auto flex">
           {/* 왼쪽 이미지 영역 - 슬라이더 */}
           <div className="w-1/4 p-6 bg-amber-100 relative overflow-hidden">
             <Swiper
@@ -411,16 +422,17 @@ const Navbar = () => {
       <div className={`transition-all duration-300 ${isScrolled ? "h-16" : "h-20"}`}></div>
 
       <nav
-        className={`w-full bg-white shadow-md z-40 sticky transition-all duration-300 ${
+        className={`w-full bg-white border-b border-gray-200 z-40 sticky transition-all duration-300 ${
           isScrolled ? "top-[64px]" : "top-20"
         } left-0 right-0`}
       >
-        <div className="max-w-[1280px] w-full mx-auto">
+        <div className="max-w-[1440px] w-full mx-auto">
           <div className="hidden md:block">
             <div className="flex items-center h-12">
               {/* 햄버거 메뉴 */}
-              <div className="relative px-4 h-full flex items-center">
+              <div className="relative px-6 h-full flex items-center">
                 <button
+                  ref={hamburgerRef}
                   onClick={toggleHamburgerModal}
                   className={`hamburger-menu-icon ${isHamburgerActive ? "active" : ""}`}
                   aria-label="전체 카테고리 메뉴"
@@ -459,7 +471,7 @@ const Navbar = () => {
           {hoveredMenu && renderSubmenu(hoveredMenu)}
 
           {/* 모바일 햄버거 버튼 */}
-          <div className="md:hidden flex justify-between items-center h-12 px-4">
+          <div className="md:hidden flex justify-between items-center h-12 px-6">
             <button className="text-gray-700 hover:text-indigo-600" onClick={toggleMobileMenu}>
               <div className={`hamburger-icon ${isMenuOpen ? "open" : ""}`}>
                 <span></span>

@@ -8,11 +8,12 @@ import Main from "./sections/Main/Main.js";
 import Register from './sections/Login/Register.js';
 import Login from "./sections/Login/Login.js";
 
-import AttendanceCheck from "./component/mypage/attendance-check.jsx";
+import AttendanceCheck from "./component/mypage/attendance-check.js";
 import MyPage from "./component/mypage/my-page.js"
 import MyPageEdit from "./component/mypage/profile-edit.js"
 
-import ProductList from "./sections/Product/ProductList.js"
+import ProductList from "./sections/Product/product-list.js"
+import ProductDetail from "./sections/Product/product-detail.js";
 
 function App() 
 {
@@ -33,6 +34,7 @@ function App()
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/mypage/edit" element={<MyPageEdit />} />
           <Route path="/product" element={<ProductList />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
       </BrowserRouter>
 

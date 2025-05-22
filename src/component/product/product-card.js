@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function ProductCard({ product }) {
+function ProductCard({ product }) 
+{
   const [isHovered, setIsHovered] = useState(false);
 
   const formatPrice = (price) => 
@@ -11,15 +13,17 @@ function ProductCard({ product }) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
+  const navigate = useNavigate();
   
   return (
     <div className="group relative flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}>
+      onMouseLeave={() => setIsHovered(false)}
+      con onClick={() => navigate(`/product/${product.id}`)}>
       {/* 상품 이미지 */}
       <div className="relative overflow-hidden bg-gray-100 mb-3 aspect-square">
         <img src={product.thumbnailUrl || "/placeholder.svg"} // ✅ 썸네일 연동
-          alt={product.name} className="object-cover transition-transform duration-300 group-hover:scale-105"
+          alt="" className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 25vw" fill />
 
         {/* 호버 아이콘 */}
@@ -38,10 +42,10 @@ function ProductCard({ product }) {
       </div>
 
       {/* 브랜드명 */}
-      <div className="h-6 mb-2 text-sm font-semibold text-gray-600">{product.brand}</div>
+      <div className="h-6 mb-1 text-sm font-semibold text-gray-600">{product.brandName || product.brand}</div>
 
       {/* 상품명 */}
-      <h3 className="text-sm font-medium mb-2 line-clamp-2 h-10">{product.name}</h3>
+      <h3 className="text-base font-semibold mb-2 line-clamp-2 h-10">{product.name}</h3>
 
       {/* 가격 */}
       <div className="mt-auto">
