@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import "../../static/css/Product.css"
-import subImg6 from "../../static/image/test/best/sub6.png"
+import subImg from "../../static/image/Product/dummy/thumb.jpg"
 
 // 카테고리별 상품 데이터 (실제 데이터로 교체 필요)
 const productData = {
@@ -10,7 +10,7 @@ const productData = {
     {
       id: 1,
       name: "Fender Player Stratocaster",
-      image: subImg6,
+      image: subImg,
       price: 890000,
       originalPrice: 1050000,
       discount: 15,
@@ -22,7 +22,7 @@ const productData = {
     {
       id: 2,
       name: "Gibson Les Paul Studio",
-      image: subImg6,
+      image: subImg,
       price: 1790000,
       originalPrice: 2100000,
       discount: 14,
@@ -34,7 +34,7 @@ const productData = {
     {
       id: 3,
       name: "PRS SE Custom 24",
-      image: subImg6,
+      image: subImg,
       price: 1250000,
       originalPrice: 1390000,
       discount: 10,
@@ -46,7 +46,7 @@ const productData = {
     {
       id: 4,
       name: "Ibanez RG550",
-      image: subImg6,
+      image: subImg,
       price: 1150000,
       originalPrice: 1290000,
       discount: 11,
@@ -60,7 +60,7 @@ const productData = {
     {
       id: 5,
       name: "Fender Player Jazz Bass",
-      image: subImg6,
+      image: subImg,
       price: 950000,
       originalPrice: 1100000,
       discount: 14,
@@ -72,7 +72,7 @@ const productData = {
     {
       id: 6,
       name: "Ibanez SR500E",
-      image: subImg6,
+      image: subImg,
       price: 850000,
       originalPrice: 950000,
       discount: 11,
@@ -84,7 +84,7 @@ const productData = {
     {
       id: 7,
       name: "Yamaha TRBX504",
-      image: subImg6,
+      image: subImg,
       price: 720000,
       originalPrice: 790000,
       discount: 9,
@@ -96,7 +96,7 @@ const productData = {
     {
       id: 8,
       name: "Sterling by Music Man StingRay",
-      image: subImg6,
+      image: subImg,
       price: 680000,
       originalPrice: 750000,
       discount: 9,
@@ -110,7 +110,7 @@ const productData = {
     {
       id: 9,
       name: "Martin D-15M",
-      image: subImg6,
+      image: subImg,
       price: 1950000,
       originalPrice: 2200000,
       discount: 11,
@@ -122,7 +122,7 @@ const productData = {
     {
       id: 10,
       name: "Taylor 214ce",
-      image: subImg6,
+      image: subImg,
       price: 1250000,
       originalPrice: 1390000,
       discount: 10,
@@ -134,7 +134,7 @@ const productData = {
     {
       id: 11,
       name: "Yamaha FG830",
-      image: subImg6,
+      image: subImg,
       price: 450000,
       originalPrice: 490000,
       discount: 8,
@@ -146,7 +146,7 @@ const productData = {
     {
       id: 12,
       name: "Takamine GD30CE",
-      image: subImg6,
+      image: subImg,
       price: 580000,
       originalPrice: 650000,
       discount: 11,
@@ -160,7 +160,7 @@ const productData = {
     {
       id: 13,
       name: "Boss GT-1000CORE",
-      image: subImg6,
+      image: subImg,
       price: 780000,
       originalPrice: 850000,
       discount: 8,
@@ -172,7 +172,7 @@ const productData = {
     {
       id: 14,
       name: "Line 6 HX Stomp",
-      image: subImg6,
+      image: subImg,
       price: 690000,
       originalPrice: 750000,
       discount: 8,
@@ -184,7 +184,7 @@ const productData = {
     {
       id: 15,
       name: "Neural DSP Quad Cortex",
-      image: subImg6,
+      image: subImg,
       price: 1950000,
       originalPrice: 2100000,
       discount: 7,
@@ -196,7 +196,7 @@ const productData = {
     {
       id: 16,
       name: "Kemper Profiler Stage",
-      image: subImg6,
+      image: subImg,
       price: 2350000,
       originalPrice: 2500000,
       discount: 6,
@@ -210,7 +210,7 @@ const productData = {
     {
       id: 17,
       name: "Elixir Nanoweb 기타 스트링",
-      image: subImg6,
+      image: subImg,
       price: 15000,
       originalPrice: 18000,
       discount: 17,
@@ -222,7 +222,7 @@ const productData = {
     {
       id: 18,
       name: "Dunlop Jazz III 피크 6개입",
-      image: subImg6,
+      image: subImg,
       price: 8000,
       originalPrice: 10000,
       discount: 20,
@@ -234,7 +234,7 @@ const productData = {
     {
       id: 19,
       name: "Fender 프리미엄 기타 케이블",
-      image: subImg6,
+      image: subImg,
       price: 35000,
       originalPrice: 42000,
       discount: 17,
@@ -246,7 +246,7 @@ const productData = {
     {
       id: 20,
       name: "Hercules 기타 스탠드",
-      image: subImg6,
+      image: subImg,
       price: 45000,
       originalPrice: 52000,
       discount: 13,

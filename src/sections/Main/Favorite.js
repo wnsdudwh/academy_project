@@ -4,11 +4,11 @@ import { useState } from "react"
 import "../../static/css/Favorite.css"
 
 // 이미지 임포트
-import subImg1 from "../../static/image/test/best/sub1.png"
-import subImg2 from "../../static/image/test/best/sub2.png"
-import subImg3 from "../../static/image/test/best/sub3.png"
-import subImg4 from "../../static/image/test/best/sub4.png"
-import subImg5 from "../../static/image/test/best/sub5.png"
+import subImg1 from "../../static/image/Product/dummy/sub1.jpg"
+import subImg2 from "../../static/image/Product/dummy/sub2.jpg"
+import subImg3 from "../../static/image/Product/dummy/sub3.jpg"
+import subImg4 from "../../static/image/Product/dummy/sub4.jpg"
+import subImg5 from "../../static/image/Product/dummy/sub5.jpg"
 
 // 상품 데이터 (실제 데이터로 교체 필요)
 const products = [

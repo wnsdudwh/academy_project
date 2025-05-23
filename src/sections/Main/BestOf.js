@@ -1,12 +1,13 @@
 import React from 'react'
 import '../../static/css/BestOf.css';
-import mainImg1 from '../../static/image/test/best/main.png';
-import subImg1 from '../../static/image/test/best/sub1.png';
-import subImg2 from '../../static/image/test/best/sub2.png';
-import subImg3 from '../../static/image/test/best/sub3.png';
-import subImg4 from '../../static/image/test/best/sub4.png';
-import subImg5 from '../../static/image/test/best/sub5.png';
-import subImg6 from '../../static/image/test/best/sub6.png';
+import mainImg1 from '../../static/image/Product/dummy/thumb.jpg';
+// 이미지 임포트
+import subImg1 from "../../static/image/Product/dummy/sub1.jpg"
+import subImg2 from "../../static/image/Product/dummy/sub2.jpg"
+import subImg3 from "../../static/image/Product/dummy/sub3.jpg"
+import subImg4 from "../../static/image/Product/dummy/sub4.jpg"
+import subImg5 from "../../static/image/Product/dummy/sub5.jpg"
+import subImg6 from "../../static/image/Product/dummy/sub6.jpg"
 
 const BestOf = () => {
     return (
