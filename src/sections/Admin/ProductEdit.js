@@ -320,13 +320,18 @@ const ProductEdit = () => {
               <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-700 mb-1">
                 새 썸네일 이미지
               </label>
-              <input
-                id="thumbnail"
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="mt-1 flex items-center">
+                <label className="w-full flex justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer focus:outline-none">
+                  <span>파일 선택</span>
+                  <input
+                    id="thumbnail"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleThumbnailChange}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
               <p className="mt-1 text-xs text-gray-500">새 썸네일 이미지를 선택하면 기존 썸네일을 대체합니다</p>
 
               {/* 새 썸네일 미리보기 */}
@@ -342,14 +347,19 @@ const ProductEdit = () => {
               <label htmlFor="subImages" className="block text-sm font-medium text-gray-700 mb-1">
                 새 서브 이미지
               </label>
-              <input
-                id="subImages"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleSubImagesChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="mt-1 flex items-center">
+                <label className="w-full flex justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer focus:outline-none">
+                  <span>파일 선택 (여러 장 가능)</span>
+                  <input
+                    id="subImages"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleSubImagesChange}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
               <p className="mt-1 text-xs text-gray-500">추가할 서브 이미지를 선택하세요 (여러 장 선택 가능)</p>
 
               {/* 새 서브 이미지 미리보기 */}

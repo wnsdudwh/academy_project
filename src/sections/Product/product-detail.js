@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Share2, Heart, ShoppingCart, ChevronRight, Clock, ChevronLeft, ChevronRightIcon, ArrowLeft } from "lucide-react"
+import { useParams } from "react-router-dom"
+import { Share2, Heart, ShoppingCart, ChevronRight, Clock, ChevronLeft, ChevronRightIcon, ArrowLeft, Loader2 } from "lucide-react"
 
 // static
 import Header from "../Common/Header"
@@ -10,25 +11,78 @@ import ProductTabs from "../../component/product/product-tabs"
 import Sidebar from "../Common/Sidebar"
 import ServiceForm from "../Common/service-form"
 import Footer from "../Common/Footer"
+import axios from "axios"
+import dummyProducts from "../../data/dummyProducts"
 
-const ProductDetail = () => {
-  const [currentImage, setCurrentImage] = useState(0)
+const ProductDetail = () => 
+{
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL;
   const [quantity, setQuantity] = useState(1)
   const [isImageHovered, setIsImageHovered] = useState(false)
 
-  // 이미지 목록 - 무한 루프 테스트용
-  const images = [
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
-  ]
+  const { id } = useParams(); // id값 가져오기
+  // 상품정보 이미지 (썸네일/서브) 관련 추가
+  const [product, setProduct] = useState(null);   // 상품 정보
+  const [images, setImages] = useState([]);     // 이미지 배열 (메인 + 서브)
+  const [currentImage, setCurrentImage] = useState(0); // 현재 선택된 이미지 인덱스
+
+  const formatPrice = (num) => num?.toLocaleString() + "원";
+
+  useEffect(() => 
+  {
+    const fetchProduct = async () =>
+    {
+      if (parseInt(id) >= 900)
+      {
+        // ✅ 더미 제품만 찾아서 넣어줌
+        const dummy = dummyProducts.find(p => p.id === parseInt(id));
+        if (dummy) 
+        {
+          const thumbnailUrl = `${dummy.thumbnailUrl}`;
+          const subImageUrls = dummy.subImages || [];
+
+          const fullImages = [thumbnailUrl, ...subImageUrls];
+          setProduct(dummy);
+          setImages(fullImages);
+        }
+        else 
+        {
+          console.error("더미 상품이 존재하지 않습니다.");
+        }
+        return; // 백엔드 요청 skip
+      }
+
+      try 
+      {
+        const res = await axios.get(`${BASE_URL}api/products/${id}`);
+        setProduct(res.data);
+
+        console.log("📦 가져온 상품:", res.data); // 👈 이거 추가
+
+      // 더미 상품인지 확인
+      const isDummy = res.data.id >= 900; // 더미 상품 ID 조건
+
+      const thumbnailUrl = isDummy
+      ? res.data.thumbnailUrl // ex) "/dummy-thumbnail.png"
+      : `${BASE_URL}${res.data.thumbnailUrl.startsWith("/") ? res.data.thumbnailUrl.slice(1) : res.data.thumbnailUrl}`;
+
+      const subImageUrls = (res.data.subImages || [])
+        .filter(Boolean) // null 또는 undefined 제거
+        .map(url => isDummy ? url : `${BASE_URL}${url.startsWith("/") ? url.slice(1) : url}`);
+
+      const allImages = thumbnailUrl
+        ? [thumbnailUrl, ...subImageUrls]
+        : subImageUrls;
+
+        setImages(allImages);
+      } 
+      catch (error) 
+      {
+        console.error("상품 로딩 실패", error);
+      }
+    };
+    fetchProduct();
+  }, [id]);
 
   // 썸네일 스와이퍼 관련 상태 및 함수
   const [startIndex, setStartIndex] = useState(0)
@@ -98,6 +152,18 @@ const ProductDetail = () => {
     return thumbnails
   }
 
+  
+  // null 체크 및 로딩 라이브러리 처리
+  if (!product)
+  {
+    return (
+      <div className="flex flex-col items-center justify-center h-60">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
+        <span className="text-gray-600 text-lg">상품 정보를 불러오는 중...</span>
+      </div>
+    )
+  }
+
   return (
     <>
     <Header />
@@ -130,17 +196,13 @@ const ProductDetail = () => {
           {/* 왼쪽: 이미지 섹션 */}
           <div className="space-y-4">
             {/* 메인 이미지 */}
-            <div
-              className="border rounded-lg overflow-hidden bg-white relative"
+            <div className="border rounded-lg overflow-hidden bg-white relative"
               onMouseEnter={() => setIsImageHovered(true)}
               onMouseLeave={() => setIsImageHovered(false)}
             >
               <div className="relative aspect-square">
-                <img
-                  src={images[currentImage] || "/placeholder.svg"}
-                  alt="STANDARD STRATOCASTER®"
-                  className="w-full h-full object-contain"
-                />
+                {/* <img src={images[currentImage] || "/placeholder.svg"} alt="STANDARD STRATOCASTER®" className="w-full h-full object-contain"/> */}
+                <img src={images[currentImage] || "/placeholder.svg"} alt={product?.name || "상품 이미지"} className="w-full h-full object-contain"/>
 
                 {/* 메인 이미지 좌우 화살표 */}
                 <button
@@ -165,29 +227,26 @@ const ProductDetail = () => {
 
             {/* 썸네일 이미지 슬라이더 */}
             <div className="relative">
-              <div
-                ref={thumbnailsRef}
-                className="overflow-hidden"
-                style={{ width: `${visibleThumbnails * 96}px` }} // 정확히 7개만 보이도록 너비 고정
+            {/* 썸네일 한 개 너비가 98px 이라고 가정하고, 7개만 보이도록 너비 고정 98 * 7 = 686px 로 고정하여 정확히 7개만 표시됨 */}
+              <div ref={thumbnailsRef} className="overflow-hidden"
+                style={{ width: `${visibleThumbnails * 98}px` }} 
               >
-                <div
-                  className="flex gap-2 transition-transform duration-300 ease-out"
+                <div className="flex gap-[0.715rem] transition-transform duration-300 ease-out"
                   style={{
-                    transform: `translateX(-${startIndex * 96}px)`,
-                    width: `${images.length * 96}px`,
+                    transform: `translateX(-${startIndex * 98}px)`,
+                    width: `${images.length * 98}px`,
                   }}
                 >
                   {images.map((img, index) => (
-                    <div
-                      key={index}
-                      className={`border rounded-md overflow-hidden flex-shrink-0 cursor-pointer ${
-                        currentImage === index ? "border-red-500" : "border-gray-200 hover:border-gray-400"
+                    <div key={index}
+                      className={`border-2 rounded-md overflow-hidden flex-shrink-0 cursor-pointer ${
+                        currentImage === index ? "border-rose-500" : "border-gray-200 hover:border-gray-400"
                       }`}
-                      onClick={() => handleThumbnailClick(index)}
+                      // onClick={() => handleThumbnailClick(index)}
+                      onClick={() => setCurrentImage(index)}
                       style={{ width: "88px", height: "88px" }}
                     >
-                      <img
-                        src={img || "/placeholder.svg"}
+                      <img src={img || "/placeholder.svg"}
                         alt={`Thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
@@ -201,31 +260,31 @@ const ProductDetail = () => {
           {/* 오른쪽: 상품 정보 섹션 */}
           <div className="space-y-6">
             {/* 상품명 */}
-            <h1 className="text-2xl font-bold">STANDARD STRATOCASTER®</h1>
+            <h1 className="text-2xl font-bold">{product.name}</h1>
 
             {/* 가격 정보 */}
             <div className="space-y-3 border-b pb-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">판매가</span>
                 <div className="flex items-center">
-                  <span className="text-red-500 font-bold mr-2">20%</span>
-                  <span className="text-xl font-bold">999,000원</span>
+                  <span className="text-red-500 font-bold mr-2">{product.discountRate}%</span>
+                  <span className="text-xl font-bold">{formatPrice(product.discountPrice)}</span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">소비자가</span>
-                <span className="text-gray-500 line-through">1,249,000원</span>
+                <span className="text-gray-500 line-through">{formatPrice(product.price)}원</span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">적립금</span>
-                <span className="text-gray-700">19,980원 (2%)</span>
+                <span className="text-gray-700">{formatPrice(Math.round(product.discountPrice * 0.05))} ({product.pointRate}%)</span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">배송비</span>
-                <span className="text-gray-700">2,500원 (50,000원 이상 구매 시 무료)</span>
+                <span className="text-gray-700">{formatPrice(product.shippingFee)}</span>
               </div>
             </div>
 
@@ -238,12 +297,12 @@ const ProductDetail = () => {
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">모델</span>
-                <span className="text-gray-700">026-0220-571</span>
+                <span className="text-gray-700">{product.name}</span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">제품상품코드</span>
-                <span className="text-gray-700">FDEG-2819-CND</span>
+                <span className="text-gray-700">{product?.productCode}</span>
               </div>
 
               <div className="flex justify-between items-center">

@@ -25,6 +25,7 @@ import AdminProductList from "./sections/Admin/AdminProductList"
 import ProductEdit from "./sections/Admin/ProductEdit"
 import OrderManagement from "./sections/Admin/OrderManagement"
 import UserManagement from "./sections/Admin/UserManagement"
+import AdminSettings from "./sections/Admin/AdminSettings"
 
 function App() {
   // Aos 초기화
@@ -54,6 +55,7 @@ function App() {
           <Route path="/admin/products/edit/:id" element={<ProductEdit />} />
           <Route path="/admin/orders" element={<OrderManagement />} />
           <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
         </Routes>
 
         {/* 토스트 알림 컴포넌트 */}

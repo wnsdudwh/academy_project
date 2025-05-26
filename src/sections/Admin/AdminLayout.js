@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
-import { Home, Package, PlusCircle, Users, Settings } from "lucide-react"
+import { Home, Package, PlusCircle, Users, Settings, ShoppingCart } from "lucide-react"
 
 const AdminLayout = ({ children }) => {
   const location = useLocation()
@@ -17,6 +17,7 @@ const AdminLayout = ({ children }) => {
     { path: "/admin/dashboard", label: "대시보드", icon: <Home size={18} /> },
     { path: "/admin/products", label: "상품 관리", icon: <Package size={18} /> },
     { path: "/admin/products/register", label: "상품 등록", icon: <PlusCircle size={18} /> },
+    { path: "/admin/orders", label: "주문 관리", icon: <ShoppingCart size={18} /> },
     { path: "/admin/users", label: "회원 관리", icon: <Users size={18} /> },
     { path: "/admin/settings", label: "설정", icon: <Settings size={18} /> },
   ]

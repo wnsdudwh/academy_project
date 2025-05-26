@@ -3,15 +3,23 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-function ProductCard({ product }) {
+function ProductCard({ product }) 
+{
   const [isHovered, setIsHovered] = useState(false)
+  const navigate = useNavigate();
+
+  const isDummy = product.id >= 900;    // 더미상품 기준 조건
+
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL;
+  const imageUrl = isDummy
+    ? product.thumbnailUrl
+    : `${BASE_URL}${product.thumbnailUrl}`.replace(/([^:]\/)\/+/g, "$1");
 
   const formatPrice = (price) => {
     if (price === null || price === undefined) return "0"
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
-  const navigate = useNavigate()
 
   return (
     <div
@@ -22,9 +30,7 @@ function ProductCard({ product }) {
     >
       {/* 상품 이미지 */}
       <div className="relative overflow-hidden bg-gray-100 mb-3 aspect-square">
-        <img
-          src={product.thumbnailUrl || "/placeholder.svg"} // ✅ 썸네일 연동
-          alt=""
+        <img src={`${imageUrl}`} alt={product.name}
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 25vw"
           fill
