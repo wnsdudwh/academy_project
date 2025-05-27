@@ -10,14 +10,16 @@ const ImagePreview = ({ images, isThumbnail }) => {
           <div
             key={index}
             className={`
-              ${isThumbnail ? "w-full h-40" : "w-full h-24"} 
+              ${isThumbnail ? "w-full max-w-full mx-auto" : "w-full h-24"} 
               relative overflow-hidden rounded-md border border-gray-200
             `}
           >
-            <img
-              src={imageUrl || "/placeholder.svg"}
+            <img src={imageUrl || "/placeholder.svg"}
               alt={`Preview ${index}`}
-              className="w-full h-full object-cover"
+              className={`
+                w-full 
+                ${isThumbnail ? "h-auto max-h-full object-contain" : "h-full object-cover"}
+              `}
               onLoad={() => {
                 // 컴포넌트가 언마운트될 때 URL.revokeObjectURL을 호출하여 메모리 누수 방지
                 return () => URL.revokeObjectURL(imageUrl)

@@ -20,6 +20,7 @@ const ProductEdit = () => {
     formState: { errors },
   } = useForm()
 
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [product, setProduct] = useState(null)
   const [thumbnail, setThumbnail] = useState(null)
   const [subImages, setSubImages] = useState([])
@@ -36,7 +37,7 @@ const ProductEdit = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`/api/products/${id}`)
+        const response = await axios.get(`${BASE_URL}api/products/${id}`)
         const productData = response.data
 
         setProduct(productData)
@@ -50,6 +51,14 @@ const ProductEdit = () => {
         setValue("brand", productData.brand)
         setValue("category", productData.category)
         setValue("stock", productData.stock)
+        setValue("visible", productData.visible ?? true)
+        setValue("newProduct", productData.newProduct ?? false)
+        setValue("releaseDate", productData.releaseDate || "")
+        setValue("tags", productData.tags || "")
+        setValue("shippingFee", productData.shippingFee || 0)
+        setValue("discountRate", productData.discountRate || 0)
+        setValue("pointRate", productData.pointRate || 0)
+        setValue("discount", productData.discount || false)
       } catch (error) {
         console.error("상품 정보 불러오기 실패:", error)
         toast.error("상품 정보를 불러오는데 실패했습니다.")
@@ -96,6 +105,20 @@ const ProductEdit = () => {
       formData.append("category", data.category)
       formData.append("stock", data.stock)
       formData.append("productCode", data.productCode)
+
+      // 새로운 필드들 추가
+      formData.append("visible", data.visible !== false)
+      formData.append("newProduct", data.newProduct || false)
+      if (data.releaseDate) {
+        formData.append("releaseDate", data.releaseDate)
+      }
+      if (data.tags) {
+        formData.append("tags", data.tags)
+      }
+      formData.append("shippingFee", data.shippingFee || 0)
+      formData.append("discountRate", data.discountRate || 0)
+      formData.append("pointRate", data.pointRate || 0)
+      formData.append("discount", data.discount || false)
 
       // 삭제할 이미지 ID들 추가
       const deletedImageIds = product.images
@@ -268,6 +291,74 @@ const ProductEdit = () => {
               </select>
               {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>}
             </div>
+
+            {/* 배송비 */}
+            <div>
+              <label htmlFor="shippingFee" className="block text-sm font-medium text-gray-700 mb-1">
+                배송비 (원)
+              </label>
+              <input
+                id="shippingFee"
+                type="number"
+                {...register("shippingFee", {
+                  min: { value: 0, message: "배송비는 0원 이상이어야 합니다" },
+                })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="배송비를 입력하세요 (기본값: 0원)"
+              />
+              {errors.shippingFee && <p className="mt-1 text-sm text-red-600">{errors.shippingFee.message}</p>}
+            </div>
+
+            {/* 할인율 */}
+            <div>
+              <label htmlFor="discountRate" className="block text-sm font-medium text-gray-700 mb-1">
+                할인율 (%)
+              </label>
+              <input
+                id="discountRate"
+                type="number"
+                step="0.1"
+                {...register("discountRate", {
+                  min: { value: 0, message: "할인율은 0% 이상이어야 합니다" },
+                  max: { value: 100, message: "할인율은 100% 이하여야 합니다" },
+                })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="할인율을 입력하세요"
+              />
+              {errors.discountRate && <p className="mt-1 text-sm text-red-600">{errors.discountRate.message}</p>}
+            </div>
+
+            {/* 적립률 */}
+            <div>
+              <label htmlFor="pointRate" className="block text-sm font-medium text-gray-700 mb-1">
+                적립률 (%)
+              </label>
+              <input
+                id="pointRate"
+                type="number"
+                step="0.1"
+                {...register("pointRate", {
+                  min: { value: 0, message: "적립률은 0% 이상이어야 합니다" },
+                  max: { value: 100, message: "적립률은 100% 이하여야 합니다" },
+                })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="적립률을 입력하세요"
+              />
+              {errors.pointRate && <p className="mt-1 text-sm text-red-600">{errors.pointRate.message}</p>}
+            </div>
+
+            {/* 출시일 */}
+            <div>
+              <label htmlFor="releaseDate" className="block text-sm font-medium text-gray-700 mb-1">
+                출시일
+              </label>
+              <input
+                id="releaseDate"
+                type="date"
+                {...register("releaseDate")}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           {/* 상품 설명 */}
@@ -283,6 +374,63 @@ const ProductEdit = () => {
               placeholder="상품에 대한 상세 설명을 입력하세요"
             ></textarea>
             {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>}
+          </div>
+
+          {/* 상품 태그 */}
+          <div>
+            <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
+              상품 태그
+            </label>
+            <input
+              id="tags"
+              type="text"
+              {...register("tags")}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="태그를 콤마(,)로 구분하여 입력하세요 (예: 인기상품, 베스트셀러, 한정판)"
+            />
+            <p className="mt-1 text-xs text-gray-500">여러 태그는 콤마(,)로 구분하여 입력하세요</p>
+          </div>
+
+          {/* 체크박스 옵션들 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 할인 여부 */}
+            <div className="flex items-center">
+              <input
+                id="discount"
+                type="checkbox"
+                {...register("discount")}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="discount" className="ml-2 block text-sm text-gray-700">
+                할인 적용
+              </label>
+            </div>
+
+            {/* 진열 여부 */}
+            <div className="flex items-center">
+              <input
+                id="visible"
+                type="checkbox"
+                {...register("visible")}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="visible" className="ml-2 block text-sm text-gray-700">
+                진열 노출
+              </label>
+            </div>
+
+            {/* 신상품 여부 */}
+            <div className="flex items-center">
+              <input
+                id="newProduct"
+                type="checkbox"
+                {...register("newProduct")}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="newProduct" className="ml-2 block text-sm text-gray-700">
+                신상품 뱃지
+              </label>
+            </div>
           </div>
 
           {/* 기존 이미지 */}

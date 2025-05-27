@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom"
 import { Home, Package, PlusCircle, Users, Settings, ShoppingCart } from "lucide-react"
 
-const AdminLayout = ({ children }) => {
-  const location = useLocation()
+const AdminLayout = ({ children }) => 
+{
+  const location = useLocation();
 
   // 현재 경로가 관리자 페이지인지 확인
   const isAdminPage = location.pathname.startsWith("/admin")
@@ -26,7 +27,7 @@ const AdminLayout = ({ children }) => {
     <div className="min-h-screen bg-gray-100">
       {/* 관리자 헤더 */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
           <div className="flex justify-between h-16 items-center">
             <h1 className="text-xl font-bold text-gray-900">악기 쇼핑몰 관리자</h1>
             <div className="flex items-center space-x-4">
@@ -40,7 +41,7 @@ const AdminLayout = ({ children }) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-2">
         <div className="flex flex-col md:flex-row">
           {/* 사이드바 */}
           <div className="w-full md:w-64 bg-white shadow-sm rounded-lg p-4 mb-6 md:mb-0 md:mr-6">
