@@ -25,9 +25,10 @@ const Login = () => {
         userpw,
       })
 
-      // 🧠 JWT 토큰 저장 (브라우저 로컬스토리지에 저장)
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("nickname", response.data.nickname)
+      // 로그인 시 JWT 토큰들 저장 (브라우저 로컬스토리지에 저장)
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("nickname", response.data.nickname);
+      localStorage.setItem("userRole", response.data.role);
 
       alert("로그인 성공!")
       navigate("/") //메인 페이지로 이동 /

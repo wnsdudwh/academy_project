@@ -274,7 +274,7 @@ const ProductDetail = () =>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">소비자가</span>
-                <span className="text-gray-500 line-through">{formatPrice(product.price)}원</span>
+                <span className="text-gray-500 line-through">{formatPrice(product.price)}</span>
               </div>
 
               <div className="flex justify-between items-center">
@@ -290,14 +290,15 @@ const ProductDetail = () =>
 
             {/* 상품 상세 정보 */}
             <div className="space-y-3 border-b pb-4">
+              {/*  */}
               <div className="flex justify-between items-center">
-                <span className="text-gray-700">원산지</span>
-                <span className="text-gray-700">인도네시아</span>
+                <span className="text-gray-700">모델</span>
+                <span className="text-gray-700">{product.brandName}</span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-gray-700">모델</span>
-                <span className="text-gray-700">{product.name}</span>
+                <span className="text-gray-700">원산지</span>
+                <span className="text-gray-700">인도네시아</span>
               </div>
 
               <div className="flex justify-between items-center">

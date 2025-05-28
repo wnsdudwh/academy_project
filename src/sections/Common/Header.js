@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from "react"
 import "../../static/css/Header.css"
+import { Link } from "react-router-dom"
 
-const Header = () => {
+const Header = () => 
+{
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const token = localStorage.getItem("token")
+
+  const token = localStorage.getItem("token");
+  const userRole = localStorage.getItem("userRole") || "ROLE_GUEST";  // 권한 가져오기 및 기본값 처리
 
   // 스크롤 감지
   useEffect(() => {
@@ -28,9 +32,11 @@ const Header = () => {
   }
 
   // 로그아웃 처리
-  const handleLogout = () => {
+  const handleLogout = () => 
+  {
     localStorage.removeItem("token")
     localStorage.removeItem("nickname")
+    localStorage.removeItem("userRole")
     window.location.href = "/"
   }
 
@@ -45,7 +51,7 @@ const Header = () => {
         {/* 로고 영역 */}
         <div className="logo-zone basis-1/4">
           <a href="/">
-            <h1 className="text-2xl font-bold text-indigo-600">GuitarShop</h1>
+            <h1 className="text-2xl font-bold text-primary-700">GuitarShop</h1>
           </a>
         </div>
 
@@ -123,13 +129,20 @@ const Header = () => {
                 </svg>
               </button>
 
-              {/* 출석체크 버튼 - 로그인 시에만 표시 */}
-              <a
-                href="/attendance/check"
-                className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md"
-              >
-                출석체크
-              </a>
+              {/* 출석체크 버튼 - 로그인 시에만 표시 or 관리자 로그인시 어드민페이지로 */}
+              {userRole === "ROLE_ADMIN" ? (
+                  <Link to="/admin/products"
+                  className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md"
+                  >
+                  상품관리
+                </Link>
+                ) : (
+                <Link to="/attendance/check"
+                  className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md"
+                >
+                  출석체크
+                </Link>
+              )}
             </>
           ) : (
             <>

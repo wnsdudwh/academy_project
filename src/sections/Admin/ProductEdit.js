@@ -9,16 +9,11 @@ import { toast } from "react-hot-toast"
 import { Loader2, ArrowLeft } from "lucide-react"
 import AdminLayout from "./AdminLayout"
 
-const ProductEdit = () => {
+const ProductEdit = () => 
+{
   const { id } = useParams()
   const navigate = useNavigate()
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm()
+  const { register, handleSubmit, reset, setValue, formState: { errors }, } = useForm()
 
   const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [product, setProduct] = useState(null)
@@ -28,50 +23,110 @@ const ProductEdit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  // 브랜드와 카테고리 목록
-  const brands = ["Fender", "Gibson", "Ibanez", "Yamaha", "Roland", "Korg", "Pearl"]
-  const categories = ["Guitar", "Bass", "Keyboard", "Drums", "Amplifier", "Accessories"]
+  const [brandList, setBrandList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [optionList, setOptionList] = useState([]);
 
-  // 상품 정보 불러오기
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true)
+  
+  const handleAddOption = () => {
+    setOptionList([
+      ...optionList,
+      {
+        optionName: '',
+        optionType: '',
+        additionalPrice: 0,
+        stock: 0,
+        soldOut: false,
+      },
+    ]);
+  };
+  const handleRemoveOption = (index) => {
+    setOptionList(optionList.filter((_, i) => i !== index));
+  };
+  
+  const handleOptionChange = (index, key, value) => {
+    const updated = [...optionList];
+    updated[index][key] = value;
+    setOptionList(updated);
+  };
+
+// 1. 브랜드/카테고리 리스트 먼저 가져오기 (최초1회)
+useEffect(() => 
+{
+  const fetchLists = async () => 
+  {
+    try 
+    {
+      // ✅ Promise.all로 브랜드와 카테고리 동시 요청
+      const [brandRes, categoryRes] = await Promise.all
+      ([
+        axios.get(`${BASE_URL}api/brand`),
+        axios.get(`${BASE_URL}api/category`)
+      ]);
+      setBrandList(brandRes.data);
+      setCategoryList(categoryRes.data);
+    } 
+    catch (err) 
+    {
+      toast.error("브랜드/카테고리 목록 불러오기 실패");
+    }
+  };
+  fetchLists();
+}, []); // 빈 배열 → 컴포넌트 마운트 시 1회만 실행
+
+  //  2. 브랜드/카테고리 목록 준비된 후 상품 데이터 불러와서 폼에 값 세팅
+  useEffect(() => 
+  {
+    // 아직 id나 브랜드/카테고리 목록이 준비 안 됐다면 skip
+    if (!id || brandList.length === 0 || categoryList.length === 0) return;
+
+    // 상품 정보 비동기로 호출
+    const fetchProduct = async () => 
+    {
+      try 
+      {
+        setLoading(true)  //  로딩 시작(true)
         const response = await axios.get(`${BASE_URL}api/products/${id}`)
         const productData = response.data
 
-        setProduct(productData)
-        setExistingImages(productData.images || [])
+        setProduct(productData) //  상품 상태 저장 (필요시 썸네일 등)
+        setExistingImages(productData.images || []) //  기존의 이미지 배열을 저장
 
-        // 폼에 기존 데이터 설정
-        setValue("productCode", productData.productCode)
-        setValue("productName", productData.productName)
-        setValue("price", productData.price)
-        setValue("description", productData.description)
-        setValue("brand", productData.brand)
-        setValue("category", productData.category)
-        setValue("stock", productData.stock)
-        setValue("visible", productData.visible ?? true)
-        setValue("newProduct", productData.newProduct ?? false)
-        setValue("releaseDate", productData.releaseDate || "")
-        setValue("tags", productData.tags || "")
-        setValue("shippingFee", productData.shippingFee || 0)
-        setValue("discountRate", productData.discountRate || 0)
-        setValue("pointRate", productData.pointRate || 0)
-        setValue("discount", productData.discount || false)
-      } catch (error) {
+        // ✅ 아래에서 폼 각 필드에 기존 상품 정보 세팅
+        // (react-hook-form의 setValue 활용)
+        setValue("productCode", productData.productCode);      // 상품코드
+        setValue("name", productData.name);             // 상품명
+        setValue("price", productData.price);                  // 판매가
+        setValue("shortDescription", productData.shortDescription); // 상품설명
+        setValue("brandId", productData.brandId);              // 브랜드 ID (기본 선택값)
+        setValue("categoryId", productData.categoryId);        // 카테고리 ID (기본 선택값)
+        setValue("stockTotal", productData.stockTotal);             // 재고수량
+        setValue("visible", productData.visible ?? true);      // 진열여부
+        setValue("newProduct", productData.newProduct ?? false); // 신상품여부
+        setValue("releaseDate", productData.releaseDate || ""); // 출시일
+        setValue("tags", productData.tags || "");                // 태그
+        setValue("shippingFee", productData.shippingFee || 0);   // 배송비
+        setValue("discountRate", productData.discountRate || 0); // 할인율
+        setValue("pointRate", productData.pointRate || 0);       // 적립률
+        setValue("discount", productData.discount || false);     // 할인여부
+        setValue("status", productData.status);                  // 상태(AVAILABLE 등)
+        // 필요한 추가 필드 계속 setValue로 세팅 가능
+
+        console.log("가져 온 데이터들 [:] ", productData)
+      } 
+      catch (error) 
+      {
         console.error("상품 정보 불러오기 실패:", error)
         toast.error("상품 정보를 불러오는데 실패했습니다.")
-        navigate("/admin/products")
-      } finally {
+        navigate("/admin/products") // 에러시 목록으로 보냄
+      } 
+      finally 
+      {
         setLoading(false)
       }
-    }
-
-    if (id) {
-      fetchProduct()
-    }
-  }, [id, setValue, navigate])
+    };
+      fetchProduct();
+  }, [id, brandList, categoryList, setValue, navigate]);
 
   const handleThumbnailChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -90,77 +145,98 @@ const ProductEdit = () => {
     setExistingImages((prev) => prev.filter((img) => img.id !== imageId))
   }
 
-  const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true)
-
-      // FormData 객체 생성
-      const formData = new FormData()
-
-      // 텍스트 데이터 추가
-      formData.append("productName", data.productName)
-      formData.append("price", data.price)
-      formData.append("description", data.description)
-      formData.append("brand", data.brand)
-      formData.append("category", data.category)
-      formData.append("stock", data.stock)
-      formData.append("productCode", data.productCode)
-
-      // 새로운 필드들 추가
-      formData.append("visible", data.visible !== false)
-      formData.append("newProduct", data.newProduct || false)
-      if (data.releaseDate) {
-        formData.append("releaseDate", data.releaseDate)
+  const onSubmit = async (data) => 
+  {
+    try 
+    {
+      setIsSubmitting(true);
+    
+      //  FormData 객체 생성
+      const formData = new FormData();
+    
+      //  텍스트 데이터(필드명은 DTO와 정확히 일치)
+      formData.append("productCode", data.productCode);      // 상품코드 (PK거나 유니크면 수정 제한 고려)
+      formData.append("name", data.name);                    // 상품명
+      formData.append("shortDescription", data.shortDescription); // 설명
+      formData.append("price", data.price);                  // 가격
+      formData.append("stockTotal", data.stockTotal);        // 재고수량
+      formData.append("status", data.status);                // 상태(AVAILABLE 등)
+      formData.append("brandId", data.brandId);              // 브랜드 ID
+      formData.append("categoryId", data.categoryId);        // 카테고리 ID
+    
+      //  추가 필드
+      formData.append("visible", data.visible !== false);    // 진열 여부
+      formData.append("newProduct", data.newProduct || false); // 신상품
+      if (data.releaseDate) formData.append("releaseDate", data.releaseDate); // 출시일
+      if (data.tags) formData.append("tags", data.tags);     // 태그
+      formData.append("shippingFee", data.shippingFee || 0); // 배송비
+      formData.append("discountRate", data.discountRate || 0); // 할인율
+      formData.append("pointRate", data.pointRate || 0);     // 적립률
+      formData.append("discount", data.discount || false);   // 할인 여부
+    
+      //  옵션 목록 (빈 배열도 보내야 에러X)
+      formData.append("options", JSON.stringify(optionList || []));
+    
+      // 삭제할 이미지 ID들 (있을 때만)
+      // if (deletedImageIds && deletedImageIds.length > 0) 
+      // {
+      //   formData.append("deletedImageIds", JSON.stringify(deletedImageIds));
+      // }
+    
+      // 썸네일(수정 시 파일 선택했을 때만)
+      if (thumbnail) 
+      {
+        formData.append("thumbnail", thumbnail);
       }
-      if (data.tags) {
-        formData.append("tags", data.tags)
+      // 서브이미지 (수정 시 파일 선택했을 때만)
+      if (subImages.length > 0) 
+      {
+        subImages.forEach((img) => formData.append("subImages", img));
       }
-      formData.append("shippingFee", data.shippingFee || 0)
-      formData.append("discountRate", data.discountRate || 0)
-      formData.append("pointRate", data.pointRate || 0)
-      formData.append("discount", data.discount || false)
-
-      // 삭제할 이미지 ID들 추가
-      const deletedImageIds = product.images
-        ?.filter((img) => !existingImages.find((existing) => existing.id === img.id))
-        .map((img) => img.id)
-
-      if (deletedImageIds && deletedImageIds.length > 0) {
-        formData.append("deletedImageIds", JSON.stringify(deletedImageIds))
+    
+      // [디버깅용] 전송 데이터 콘솔로 확인
+      for (let [key, value] of formData.entries())
+      {
+        console.log(`🟡 formData 필드: ${key} →`, value);
       }
-
-      // 새 썸네일 이미지 추가
-      if (thumbnail) {
-        formData.append("thumbnail", thumbnail)
+    
+      // API 호출 - 백엔드 REST 컨벤션에 따라 주소 확인
+      const response = await axios.put(
+        `${BASE_URL}api/products/update/${id}`, // 이 부분! ("/update/" 누락/경로 일치 여부 확인)
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+    
+      // 성공 처리
+      toast.success("상품이 성공적으로 수정되었습니다!");
+      navigate("/admin/products");
+      console.log("수정 성공:", response.data);
+    } 
+    catch (error) 
+    {
+      // 실패 처리
+      console.error("상품 수정 실패:", error);
+      if (error.response?.status === 400) 
+      {
+        toast.error("요청 형식이 잘못되었습니다. 필수 항목을 확인해주세요.");
+      } 
+      else if (error.response?.status === 404) 
+      {
+        toast.error("수정하려는 상품이 존재하지 않습니다.");
+      } 
+      else 
+      {
+        toast.error("상품 수정에 실패했습니다. 다시 시도해주세요.");
       }
-
-      // 새 서브 이미지들 추가
-      if (subImages.length > 0) {
-        subImages.forEach((image) => {
-          formData.append("subImages", image)
-        })
-      }
-
-      // API 호출
-      const response = await axios.put(`/api/products/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-
-      toast.success("상품이 성공적으로 수정되었습니다!")
-      navigate("/admin/products")
-
-      console.log("수정 성공:", response.data)
-    } catch (error) {
-      console.error("상품 수정 실패:", error)
-      toast.error("상품 수정에 실패했습니다. 다시 시도해주세요.")
-    } finally {
-      setIsSubmitting(false)
+    } 
+    finally 
+    {
+      setIsSubmitting(false);
     }
-  }
+  }    
 
-  if (loading) {
+  if (loading) 
+  {
     return (
       <AdminLayout>
         <div className="flex justify-center items-center h-64">
@@ -188,13 +264,8 @@ const ProductEdit = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 상품 코드 */}
             <div>
-              <label htmlFor="productCode" className="block text-sm font-medium text-gray-700 mb-1">
-                상품 코드 *
-              </label>
-              <input
-                id="productCode"
-                type="text"
-                {...register("productCode", { required: "상품 코드는 필수입니다" })}
+              <label htmlFor="productCode" className="block text-sm font-medium text-gray-700 mb-1">상품 코드 *</label>
+              <input id="productCode" type="text" {...register("productCode", { required: "상품 코드는 필수입니다" })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="예: GT-001"
               />
@@ -203,13 +274,8 @@ const ProductEdit = () => {
 
             {/* 상품명 */}
             <div>
-              <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-1">
-                상품명 *
-              </label>
-              <input
-                id="productName"
-                type="text"
-                {...register("productName", { required: "상품명은 필수입니다" })}
+              <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-1">상품명 *</label>
+              <input id="productName" type="text" {...register("name", { required: "상품명은 필수입니다" })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="상품명을 입력하세요"
               />
@@ -242,7 +308,7 @@ const ProductEdit = () => {
               <input
                 id="stock"
                 type="number"
-                {...register("stock", {
+                {...register("stockTotal", {
                   required: "재고 수량은 필수입니다",
                   min: { value: 0, message: "재고는 0개 이상이어야 합니다" },
                 })}
@@ -254,18 +320,14 @@ const ProductEdit = () => {
 
             {/* 브랜드 */}
             <div>
-              <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">
-                브랜드 *
-              </label>
-              <select
-                id="brand"
-                {...register("brand", { required: "브랜드는 필수입니다" })}
+              <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">브랜드 *</label>
+              <select id="brandId" {...register("brandId", { required: "브랜드는 필수입니다" })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">브랜드 선택</option>
-                {brands.map((brand) => (
-                  <option key={brand} value={brand}>
-                    {brand}
+                <option value="">브랜드를 선택하세요</option>
+                {brandList.map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
                   </option>
                 ))}
               </select>
@@ -274,18 +336,14 @@ const ProductEdit = () => {
 
             {/* 카테고리 */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                카테고리 *
-              </label>
-              <select
-                id="category"
-                {...register("category", { required: "카테고리는 필수입니다" })}
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">카테고리 *</label>
+              <select id="categoryId" {...register("categoryId", { required: "카테고리는 필수입니다" })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">카테고리 선택</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
+                <option value="">카테고리를 선택하세요</option>
+                {categoryList.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
                   </option>
                 ))}
               </select>
@@ -297,14 +355,11 @@ const ProductEdit = () => {
               <label htmlFor="shippingFee" className="block text-sm font-medium text-gray-700 mb-1">
                 배송비 (원)
               </label>
-              <input
-                id="shippingFee"
-                type="number"
-                {...register("shippingFee", {
+              <input id="shippingFee" type="number" {...register("shippingFee", {
                   min: { value: 0, message: "배송비는 0원 이상이어야 합니다" },
                 })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="배송비를 입력하세요 (기본값: 0원)"
+                placeholder="배송비를 입력하세요 (기본값: 4,000원)"
               />
               {errors.shippingFee && <p className="mt-1 text-sm text-red-600">{errors.shippingFee.message}</p>}
             </div>
@@ -314,10 +369,7 @@ const ProductEdit = () => {
               <label htmlFor="discountRate" className="block text-sm font-medium text-gray-700 mb-1">
                 할인율 (%)
               </label>
-              <input
-                id="discountRate"
-                type="number"
-                step="0.1"
+              <input id="discountRate" type="number" step="0.1"
                 {...register("discountRate", {
                   min: { value: 0, message: "할인율은 0% 이상이어야 합니다" },
                   max: { value: 100, message: "할인율은 100% 이하여야 합니다" },
@@ -333,10 +385,7 @@ const ProductEdit = () => {
               <label htmlFor="pointRate" className="block text-sm font-medium text-gray-700 mb-1">
                 적립률 (%)
               </label>
-              <input
-                id="pointRate"
-                type="number"
-                step="0.1"
+              <input id="pointRate" type="number" step="0.1"
                 {...register("pointRate", {
                   min: { value: 0, message: "적립률은 0% 이상이어야 합니다" },
                   max: { value: 100, message: "적립률은 100% 이하여야 합니다" },
@@ -361,38 +410,89 @@ const ProductEdit = () => {
             </div>
           </div>
 
-          {/* 상품 설명 */}
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              상품 설명 *
-            </label>
-            <textarea
-              id="description"
-              {...register("description", { required: "상품 설명은 필수입니다" })}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="상품에 대한 상세 설명을 입력하세요"
-            ></textarea>
-            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>}
-          </div>
+          {/* 옵션 등록 섹션 */}
+<div className="mt-6">
+  <h3 className="text-lg font-semibold mb-2">상품 옵션</h3>
 
-          {/* 상품 태그 */}
-          <div>
-            <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
-              상품 태그
-            </label>
-            <input
-              id="tags"
-              type="text"
-              {...register("tags")}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="태그를 콤마(,)로 구분하여 입력하세요 (예: 인기상품, 베스트셀러, 한정판)"
-            />
-            <p className="mt-1 text-xs text-gray-500">여러 태그는 콤마(,)로 구분하여 입력하세요</p>
-          </div>
+  {optionList.map((option, index) => (
+    <div key={index} className="grid grid-cols-2 gap-4 mb-4 border p-3 rounded">
+      <input
+        type="text"
+        placeholder="옵션 이름 (예: Red)"
+        value={option.optionName}
+        onChange={(e) =>
+          handleOptionChange(index, 'optionName', e.target.value)
+        }
+        className="p-2 border rounded w-full"
+      />
+      <input
+        type="text"
+        placeholder="옵션 타입 (예: 색상)"
+        value={option.optionType}
+        onChange={(e) =>
+          handleOptionChange(index, 'optionType', e.target.value)
+        }
+        className="p-2 border rounded w-full"
+      />
+      <input
+        type="number"
+        placeholder="추가 가격 (예: 5000)"
+        value={option.additionalPrice}
+        onChange={(e) =>
+          handleOptionChange(index, 'additionalPrice', e.target.value)
+        }
+        className="p-2 border rounded w-full"
+      />
+      <input
+        type="number"
+        placeholder="재고 수량"
+        value={option.stock}
+        onChange={(e) =>
+          handleOptionChange(index, 'stock', e.target.value)
+        }
+        className="p-2 border rounded w-full"
+      />
+      <label className="col-span-2 flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={option.soldOut}
+          onChange={(e) =>
+            handleOptionChange(index, 'soldOut', e.target.checked)
+          }
+        />
+        품절 처리
+      </label>
+      <button
+        type="button"
+        className="text-red-500 text-sm mt-1"
+        onClick={() => handleRemoveOption(index)}
+      >
+        옵션 삭제
+      </button>
+    </div>
+  ))}
 
-          {/* 체크박스 옵션들 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <button
+    type="button"
+    className="px-4 py-2 bg-blue-500 text-white rounded"
+    onClick={handleAddOption}
+  >
+    + 옵션 추가
+  </button>
+</div>
+
+         {/* 체크박스 옵션들 */}
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 진열 여부 */}
+            <div className="flex items-center">
+              <input id="visible" type="checkbox" {...register("visible")}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="visible" className="ml-2 block text-sm text-gray-700 font-semibold">
+                진열 노출
+              </label>
+            </div>
+
             {/* 할인 여부 */}
             <div className="flex items-center">
               <input
@@ -403,19 +503,6 @@ const ProductEdit = () => {
               />
               <label htmlFor="discount" className="ml-2 block text-sm text-gray-700">
                 할인 적용
-              </label>
-            </div>
-
-            {/* 진열 여부 */}
-            <div className="flex items-center">
-              <input
-                id="visible"
-                type="checkbox"
-                {...register("visible")}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="visible" className="ml-2 block text-sm text-gray-700">
-                진열 노출
               </label>
             </div>
 
@@ -432,6 +519,49 @@ const ProductEdit = () => {
               </label>
             </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 상품 태그 */}
+            <div>
+              <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">상품 태그</label>
+              <input id="tags" type="text" {...register("tags")}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="태그를 콤마(,)로 구분하여 입력하세요 (예: 인기상품, 베스트셀러, 한정판)"
+              />
+              <p className="mt-1 text-xs text-gray-500">여러 태그는 콤마(,)로 구분하여 입력하세요</p>
+          </div>
+
+           {/* 상태 선택 */}
+           <div>
+              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                상품 상태 *
+              </label>
+              <select id="status" {...register("status", { required: "상품 상태는 필수입니다" })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                defaultValue="AVAILABLE">
+                <option value="">상태 선택</option>
+                <option value="AVAILABLE">판매중</option>
+                <option value="SOLD_OUT">품절</option>
+                <option value="UNAVAILABLE">판매중지/삭제/숨김</option>
+              </select>
+              {errors.status && <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>}
+            </div>
+          </div>
+
+          {/* 상품 설명 */}
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              상품 설명 *
+            </label>
+            <textarea id="description" {...register("shortDescription", { required: "상품 설명은 필수입니다" })}
+              rows={4}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="상품에 대한 상세 설명을 입력하세요"
+            ></textarea>
+            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>}
+          </div>
+
+
 
           {/* 기존 이미지 */}
           {existingImages.length > 0 && (

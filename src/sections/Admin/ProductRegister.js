@@ -42,10 +42,6 @@ const ProductRegister = () => {
     setOptionList(updated);
   };
 
-  // 브랜드와 카테고리 목록 (실제로는 API에서 가져올 수 있음) 더미 데이터
-  // const brands = ["Fender", "Gibson", "Ibanez", "Yamaha", "Roland", "Korg", "Pearl"]
-  // const categories = ["Guitar", "Bass", "Keyboard", "Drums", "Amplifier", "Accessories"]
-
   useEffect(() =>
   {
     axios.get(`${BASE_URL}api/brand`)
@@ -97,7 +93,8 @@ return;
       return
     }
 
-    try {
+    try 
+    {
       // FormData 객체 생성
       const formData = new FormData()
 
@@ -429,6 +426,20 @@ return;
 
           {/* 체크박스 옵션들 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 진열 여부 */}
+            <div className="flex items-center">
+              <input
+                id="visible"
+                type="checkbox"
+                {...register("visible")}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                defaultChecked={true}
+              />
+              <label htmlFor="visible" className="ml-2 block text-sm text-gray-700 font-semibold">
+                진열 노출
+              </label>
+            </div>
+
             {/* 할인 여부 */}
             <div className="flex items-center">
               <input
@@ -439,20 +450,6 @@ return;
               />
               <label htmlFor="discount" className="ml-2 block text-sm text-gray-700">
                 할인 적용
-              </label>
-            </div>
-
-            {/* 진열 여부 */}
-            <div className="flex items-center">
-              <input
-                id="visible"
-                type="checkbox"
-                {...register("visible")}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                defaultChecked={true}
-              />
-              <label htmlFor="visible" className="ml-2 block text-sm text-gray-700">
-                진열 노출
               </label>
             </div>
 

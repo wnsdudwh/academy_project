@@ -41,17 +41,21 @@ const AdminProductList = () =>
   ]
 
   useEffect(() =>
-    {
+  {
       axios.get(`${BASE_URL}api/brand`)
       .then(res => setBrandList(res.data))
       .catch(err => console.error("브랜드 목록 로딩 실패 : ", err));
   
       axios.get(`${BASE_URL}api/category`)
       .then(res => setCategoryList(res.data))
-      .catch(err => console.error("카테고리 ㅣ목록 로딩 실패 : ", err))
+      .catch(err => console.error("카테고리 목록 로딩 실패 : ", err))
     }, []);
 
-    useEffect(() => {
+    useEffect(() => 
+    {
+      // 디버깅용  (id 체크 방어코드, 상품 목록에서 에러가 자꾸떠서 넣음 -> 상세페이지 선 api호출 방지)
+      if (!id) return;
+
       axios.get(`${BASE_URL}api/products/${id}`)
         .then((res) => {
           setProduct(res.data); // ✅ 백엔드 응답으로 product 정보 설정
@@ -65,11 +69,13 @@ const AdminProductList = () =>
   // 상품 목록 불러오기
   const fetchProducts = async () => 
   {
-    try {
+    try 
+    {
       setLoading(true)
       const response = await axios.get(`${BASE_URL}api/products`)
       setProducts(response.data)
       setError(null)
+      console.log("🧪 상품 데이터:", response.data);
     } 
     catch (err) 
     {
@@ -95,13 +101,18 @@ const AdminProductList = () =>
   }
 
   // 상품 삭제 핸들러
-  const handleDeleteProduct = async (productId) => {
-    if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) {
-      try {
-        await axios.delete(`${BASE_URL}api/products/${productId}`)
-        toast.success("상품이 성공적으로 삭제되었습니다.")
+  const handleDeleteProduct = async (productId) => 
+  {
+    if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) 
+    {
+      try 
+      {
+        await axios.delete(`${BASE_URL}api/products/${productId}/soft-delete`)
+        toast.success("상품이 성공적으로 삭제처리 되었습니다.")
         fetchProducts() // 목록 새로고침
-      } catch (err) {
+      } 
+      catch (err) 
+      {
         console.error("상품 삭제 실패:", err)
         toast.error("상품 삭제에 실패했습니다.")
       }
@@ -109,8 +120,10 @@ const AdminProductList = () =>
   }
 
   // 상품 상태 변경
-  const handleStatusChange = async (productId, newStatus) => {
-    try {
+  const handleStatusChange = async (productId, newStatus) => 
+  {
+    try 
+    {
       await axios.put(`${BASE_URL}api/products/${productId}/status`, { status: newStatus })
       setProducts((prev) =>
         prev.map((product) => (product.id === productId ? { ...product, status: newStatus } : product)),
@@ -123,15 +136,19 @@ const AdminProductList = () =>
   }
 
   // 진열 여부 토글
-  const handleVisibilityToggle = async (productId, currentVisibility) => {
-    try {
+  const handleVisibilityToggle = async (productId, currentVisibility) => 
+  {
+    try 
+    {
       const newVisibility = !currentVisibility
       await axios.put(`${BASE_URL}api/products/${productId}/visibility`, { visible: newVisibility })
       setProducts((prev) =>
         prev.map((product) => (product.id === productId ? { ...product, visible: newVisibility } : product)),
       )
       toast.success(`상품이 ${newVisibility ? "진열" : "숨김"} 상태로 변경되었습니다.`)
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       console.error("진열 상태 변경 실패:", err)
       toast.error("진열 상태 변경에 실패했습니다.")
     }
@@ -182,14 +199,16 @@ const AdminProductList = () =>
     }
   }
 
-  const getStatusLabel = (status, stock) => {
-    if (stock === 0) return "품절"
-    switch (status) {
-      case "active":
+  const getStatusLabel = (status, stockTotal) => 
+  {
+    if (stockTotal === 0) return "품절"
+    switch (status) 
+    {
+      case "AVAILABLE":
         return "판매중"
-      case "inactive":
+      case "UNAVAILABLE":
         return "판매중지"
-      case "out_of_stock":
+      case "SOLD_OUT":
         return "품절"
       default:
         return "알 수 없음"
@@ -323,46 +342,25 @@ const AdminProductList = () =>
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         썸네일
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         상품 정보
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         가격
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         재고
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         상태
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         진열/뱃지
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         관리
                       </th>
                     </tr>
@@ -380,7 +378,7 @@ const AdminProductList = () =>
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                            {product.productName}
+                            {product.name}
                             {product.newProduct && (
                               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
                                 NEW
@@ -388,8 +386,8 @@ const AdminProductList = () =>
                             )}
                           </div>
                           <div className="text-xs text-gray-500">코드: {product.productCode}</div>
-                          <div className="text-xs text-gray-500">브랜드: {product.brand}</div>
-                          <div className="text-xs text-gray-500">카테고리: {product.category}</div>
+                          <div className="text-xs text-gray-500">브랜드: {product.brandName}</div>
+                          <div className="text-xs text-gray-500">카테고리: {product.categoryName}</div>
                           {product.tags && <div className="text-xs text-gray-500">태그: {product.tags}</div>}
                           {product.releaseDate && (
                             <div className="text-xs text-gray-500">출시일: {product.releaseDate}</div>
@@ -408,14 +406,14 @@ const AdminProductList = () =>
                                   : "bg-red-100 text-red-800"
                             }`}
                           >
-                            {product.stock} 개
+                            {product.stockTotal} 개
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(product.status, product.stock)}`}
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(product.status, product.stockTotal)}`}
                           >
-                            {getStatusLabel(product.status, product.stock)}
+                            {getStatusLabel(product.status, product.stockTotal)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -436,30 +434,22 @@ const AdminProductList = () =>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
-                            <select
-                              value={product.status}
-                              onChange={(e) => handleStatusChange(product.id, e.target.value)}
+                            <select value={product.status} onChange={(e) => handleStatusChange(product.id, e.target.value)}
                               className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                              <option value="active">판매중</option>
-                              <option value="inactive">판매중지</option>
-                              <option value="out_of_stock">품절</option>
+                              <option value="AVAILABLE">판매중</option>
+                              <option value="SOLD_OUT">품절</option>
+                              <option value="UNAVAILABLE">판매중단</option>
                             </select>
-                            <Link
-                              to={`/admin/products/edit/${product.id}`}
-                              className="text-indigo-600 hover:text-indigo-900 focus:outline-none"
-                              title="수정"
-                            >
+
+                            <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 focus:outline-none" title="수정">
                               <Edit className="w-5 h-5" />
                               <span className="sr-only">수정</span>
                             </Link>
-                            <button
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="text-red-600 hover:text-red-900 focus:outline-none"
-                              title="삭제"
-                            >
+
+                            <button onClick={() => handleDeleteProduct(product.id)} className="text-red-600 hover:text-red-900 focus:outline-none" title="삭제">
                               <Trash2 className="w-5 h-5" />
-                              <span className="sr-only">삭제</span>
+                              <span className="sr-only">상품 삭제</span>
                             </button>
                           </div>
                         </td>
@@ -483,8 +473,7 @@ const AdminProductList = () =>
                     </button>
 
                     {[...Array(totalPages)].map((_, index) => (
-                      <button
-                        key={index}
+                      <button key={index}
                         onClick={() => setCurrentPage(index + 1)}
                         className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
                           currentPage === index + 1
