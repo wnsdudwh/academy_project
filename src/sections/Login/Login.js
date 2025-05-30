@@ -12,6 +12,7 @@ import SocialLogin from "./SnsLogin"
 import "../../static/css/boardLogin.css"
 
 const Login = () => {
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [userid, setUserid] = useState("")
   const [userpw, setUserpw] = useState("")
   const navigate = useNavigate()
@@ -20,7 +21,7 @@ const Login = () => {
     e.preventDefault()
 
     try {
-      const response = await axios.post("http://localhost:8080/auth/login", {
+      const response = await axios.post(BASE_URL + "auth/login", {
         userid,
         userpw,
       })

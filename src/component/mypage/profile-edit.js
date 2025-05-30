@@ -20,6 +20,7 @@ export default function ProfileEdit ({
   const location = useLocation();
   const navigate = useNavigate();
 
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const userInfo = propUserInfo || location.state?.userInfo;
   const addresses = propAddresses || location.state?.addresses || [];
   const defaultAddressId = propDefaultAddressId || location.state?.defaultAddressId || null;
@@ -87,7 +88,7 @@ const handleSubmitNickname = async () =>
       const token = localStorage.getItem("token"); // 🔐 로컬 스토리지에서 토큰 꺼냄
   
       // 🔁 닉네임 변경 요청 (백엔드로 PUT 요청 전송)
-      const response = await axios.put("http://localhost:8080/auth/mypage/update",
+      const response = await axios.put(BASE_URL + "auth/mypage/update",
       {
         nickname: nickname  // ✏️ 변경할 닉네임 (상태값)
       },
@@ -119,7 +120,7 @@ const handleNicknameCheck = async () =>
   // 중복 아니고 확인도 했으면 PATCH 요청
   try 
   {
-    const response = await axios.get(`http://localhost:8080/auth/check-nickname?nickname=${nickname}`);
+    const response = await axios.get(BASE_URL + `auth/check-nickname?nickname=${nickname}`);
     const available = response.data;
 
     if (available)
@@ -163,7 +164,7 @@ const handleNicknameCheck = async () =>
       const token = localStorage.getItem("token");
 
       // 3. 서버에 저장 요청
-      const response = await axios.put("http://localhost:8080/auth/mypage/update-phone",
+      const response = await axios.put(BASE_URL + "auth/mypage/update-phone",
       {
         phone : phone
       },

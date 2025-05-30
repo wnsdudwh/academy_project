@@ -20,6 +20,7 @@ import ShoppingAddressModal from "./shopping-address-modal"
 import { useNavigate } from "react-router-dom"
 
 export default function MyPage() {
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [userInfo, setUserInfo] = useState(null)
   const [activeTab, setActiveTab] = useState("profile")
   const [isLoading, setIsLoading] = useState(true)
@@ -33,7 +34,7 @@ export default function MyPage() {
         setIsLoading(true)
         const token = localStorage.getItem("token")
 
-        const response = await axios.get("http://localhost:8080/auth/mypage", {
+        const response = await axios.get(BASE_URL + "auth/mypage", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

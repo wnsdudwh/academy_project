@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 const AttendanceCheck = () => 
-  {
+{
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [currentDate, setCurrentDate] = useState(new Date())
   const [attendanceDates, setAttendanceDates] = useState([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +26,7 @@ const AttendanceCheck = () =>
           alert("로그인이 필요한 페이지입니다.");
           navigate("/login");
       }
-  }, []);
+  }, [navigate]);
 
   // 커스텀 애니메이션 스타일
   const animationStyle = `
@@ -54,11 +55,14 @@ const AttendanceCheck = () =>
 
   // 출석 데이터 가져오기
   useEffect(() => {
-    const fetchAttendanceData = async () => {
+    const fetchAttendanceData = async () => 
+    {
       setLoading(true)
-      try {
+      try 
+      {
         const token = localStorage.getItem("token")
-        if (!token) {
+        if (!token) 
+        {
           setLoading(false)
           return
         }
@@ -67,7 +71,7 @@ const AttendanceCheck = () =>
         const year = currentDate.getFullYear()
         const month = currentDate.getMonth() + 1
 
-        const response = await fetch(`http://localhost:8080/attendance/list?year=${year}&month=${month}`, {
+        const response = await fetch(`${BASE_URL}attendance/list?year=${year}&month=${month}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -111,7 +115,7 @@ const AttendanceCheck = () =>
     try
     {
       // ✅ 출석 체크 API 호출
-      const response = await fetch("http://localhost:8080/attendance/check", 
+      const response = await fetch(BASE_URL + "attendance/check", 
       {
         method: "POST",
         headers: 
@@ -134,7 +138,7 @@ const AttendanceCheck = () =>
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
 
-    const listResponse = await fetch(`http://localhost:8080/attendance/list?year=${year}&month=${month}`, {
+    const listResponse = await fetch(BASE_URL + `attendance/list?year=${year}&month=${month}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -221,7 +225,7 @@ const AttendanceCheck = () =>
                 {day}
                 {isAttendedDate(day) && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-red-500 font-bold animate-appear">✓</span>
+                    <span className="text-red-600 font-bold animate-appear text-3xl">✓</span>
                   </div>
                 )}
               </div>

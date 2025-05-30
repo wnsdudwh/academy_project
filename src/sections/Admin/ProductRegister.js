@@ -506,7 +506,7 @@ return;
               {...register("shortDescription", { required: "상품 설명은 필수입니다" })}
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="상품에 대한 상세 설명을 입력하세요"
+              placeholder="상품에 대한 상세 설명을 입력하세요" maxlength="500"
             ></textarea>
             {errors.shortDescription && <p className="mt-1 text-sm text-red-600">{errors.shortDescription.message}</p>}
           </div>

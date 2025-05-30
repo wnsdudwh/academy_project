@@ -107,7 +107,7 @@ const AdminProductList = () =>
     {
       try 
       {
-        await axios.delete(`${BASE_URL}api/products/${productId}/soft-delete`)
+        await axios.put(`${BASE_URL}api/products/${productId}/soft-delete`)
         toast.success("상품이 성공적으로 삭제처리 되었습니다.")
         fetchProducts() // 목록 새로고침
       } 
@@ -342,26 +342,26 @@ const AdminProductList = () =>
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-[0.8rem] font-semibold text-gray-700 uppercase tracking-wider text-center">
                         썸네일
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-[0.8rem] font-semibold text-gray-700 uppercase tracking-wider text-center">
                         상품 정보
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-[0.8rem] font-semibold text-gray-700 uppercase tracking-wider text-center">
                         가격
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-[0.8rem] font-semibold text-gray-700 uppercase tracking-wider text-center">
                         재고
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-[0.8rem] font-semibold text-gray-700 uppercase tracking-wider text-center">
                         상태
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        진열/뱃지
+                      <th scope="col" className="px-6 py-3 text-[0.8rem] font-semibold text-gray-700 uppercase tracking-wider text-center">
+                        진열
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        관리
+                      <th scope="col" className="px-6 py-3 text-[0.8rem] font-semibold text-gray-700 uppercase tracking-wider text-center">
+                        상태관리
                       </th>
                     </tr>
                   </thead>
@@ -429,28 +429,32 @@ const AdminProductList = () =>
                             >
                               {product.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                             </button>
-                            {product.newProduct && <Star className="w-4 h-4 text-yellow-500" title="신상품" />}
+                            {/* {product.newProduct && <Star className="w-4 h-4 text-yellow-500" title="신상품" />} */}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center space-x-2">
-                            <select value={product.status} onChange={(e) => handleStatusChange(product.id, e.target.value)}
-                              className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                              <option value="AVAILABLE">판매중</option>
-                              <option value="SOLD_OUT">품절</option>
-                              <option value="UNAVAILABLE">판매중단</option>
-                            </select>
+                          <div className="flex flex-col items-center space-x-2">
+                            <div className="mb-2">
+                              <select value={product.status} onChange={(e) => handleStatusChange(product.id, e.target.value)}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              >
+                                <option value="AVAILABLE">판매중</option>
+                                <option value="SOLD_OUT">품절</option>
+                                <option value="UNAVAILABLE">판매중단</option>
+                              </select>
+                            </div>
 
-                            <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 focus:outline-none" title="수정">
-                              <Edit className="w-5 h-5" />
-                              <span className="sr-only">수정</span>
-                            </Link>
+                            <div className="flex items-center space-x-2">
+                              <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 focus:outline-none" title="수정">
+                                <Edit className="w-5 h-5" />
+                                <span className="sr-only">수정</span>
+                              </Link>
 
-                            <button onClick={() => handleDeleteProduct(product.id)} className="text-red-600 hover:text-red-900 focus:outline-none" title="삭제">
-                              <Trash2 className="w-5 h-5" />
-                              <span className="sr-only">상품 삭제</span>
-                            </button>
+                              <button onClick={() => handleDeleteProduct(product.id)} className="text-red-600 hover:text-red-900 focus:outline-none" title="삭제">
+                                <Trash2 className="w-5 h-5" />
+                                <span className="sr-only">상품 삭제</span>
+                              </button>
+                            </div>
                           </div>
                         </td>
                       </tr>
