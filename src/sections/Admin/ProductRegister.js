@@ -59,8 +59,10 @@ const ProductRegister = () => {
     }
   }
 
-  const handleSubImagesChange = (e) => {
-    if (e.target.files) {
+  const handleSubImagesChange = (e) => 
+  {
+    if (e.target.files) 
+      {
       setSubImages(Array.from(e.target.files))
     }
   }
@@ -75,17 +77,17 @@ const ProductRegister = () => {
       setIsSubmitting(false)
       return // 등록 진행 막기
     }
-// 필수 체크
-if (!data.productCode || !data.name || !data.price || !thumbnail || !data.status ||
-  data.discount === undefined || data.discountRate === undefined ||
-  data.pointRate === undefined || data.stockTotal === undefined ||
-  data.brandId === undefined || data.categoryId === undefined ||
-  data.shortDescription === undefined) 
-{
-toast.error("필수 입력값을 모두 채워주세요!");
-setIsSubmitting(false);
-return;
-}
+  // 필수 상품설정 체크
+  if (!data.productCode || !data.name || !data.price || !thumbnail || !data.status ||
+    data.discount === undefined || data.discountRate === undefined ||
+    data.pointRate === undefined || data.stockTotal === undefined ||
+    data.brandId === undefined || data.categoryId === undefined ||
+    data.shortDescription === undefined) 
+  {
+  toast.error("필수 입력값을 모두 채워주세요!");
+  setIsSubmitting(false);
+  return;
+  }
 
     if (thumbnail && thumbnail.size > 5 * 1024 * 1024) {
       toast.error("썸네일 이미지는 5MB 이하만 가능합니다.")
@@ -119,12 +121,11 @@ return;
       formData.append("newProduct", data.newProduct || false) // 신상품 여부 (기본값: false)
 
       // 날짜 필드
-      if (data.releaseDate) {
-        formData.append("releaseDate", data.releaseDate) // 출시일 (yyyy-MM-dd)
-      }
+      formData.append("releaseDate", data.releaseDate);
 
       // 태그 필드
-      if (data.tags) {
+      if (data.tags) 
+      {
         formData.append("tags", data.tags) // 상품 태그 (콤마 구분)
       }
 
@@ -134,12 +135,25 @@ return;
 
       // 이미지 파일
       formData.append("thumbnail", thumbnail) // 썸네일 이미지 파일 1개
-      subImages.forEach((img) => {
-        formData.append("subImages", img) // 서브 이미지 여러 장
-      })
+      if (subImages && Array.isArray(subImages))
+      {
+        subImages.forEach((img) => 
+        {
+          formData.append("subImages", img) // 서브 이미지 여러 장
+        })
+      }
 
-      // 옵션 목록 (JSON 문자열로 직렬화)
-      formData.append("options", JSON.stringify(optionList || [])) // 옵션들 [{optionName, extraPrice}, ...] null일시 빈배열 처리
+      // 옵션 목록 (JSON 문자열로 직렬화) -> 아래 배열 펼쳐서 보내게 수정했음.
+      // formData.append("options", JSON.stringify(optionList || [])) // 옵션들 [{optionName, extraPrice}, ...] null일시 빈배열 처리
+
+      // options: 배열일 경우
+      (optionList || []).forEach((opt, index) => {
+        formData.append(`options[${index}].optionName`, opt.optionName || "")
+        formData.append(`options[${index}].optionType`, opt.optionType || "")
+        formData.append(`options[${index}].additionalPrice`, opt.additionalPrice || 0)
+        formData.append(`options[${index}].stock`, opt.stock || 0)
+        formData.append(`options[${index}].soldOut`, opt.soldOut || false)
+      })
 
       // ✅ 디버깅: FormData 전체 콘솔 출력
       for (let [key, value] of formData.entries())
@@ -163,14 +177,21 @@ return;
       setThumbnail(null)
       setSubImages([])
       navigate("/admin/products")
-    } catch (error) {
+    }
+    catch (error) 
+    {
       console.error("상품 등록 실패:", error)
-      if (error.response?.status === 400) {
+      if (error.response?.status === 400) 
+      {
         toast.error("요청 형식이 잘못되었습니다. 필수 항목을 확인해주세요.")
-      } else {
+      } 
+      else 
+      {
         toast.error("상품 등록에 실패했습니다. 다시 시도해주세요.")
       }
-    } finally {
+    } 
+    finally 
+    {
       setIsSubmitting(false)
     }
   }
@@ -324,10 +345,7 @@ return;
               <label htmlFor="pointRate" className="block text-sm font-medium text-gray-700 mb-1">
                 적립률 (%)
               </label>
-              <input
-                id="pointRate"
-                type="number"
-                step="0.1"
+              <input id="pointRate" type="number" step="0.1"
                 {...register("pointRate", {
                   min: { value: 0, message: "적립률은 0% 이상이어야 합니다" },
                   max: { value: 100, message: "적립률은 100% 이하여야 합니다" },
@@ -344,10 +362,7 @@ return;
               <label htmlFor="releaseDate" className="block text-sm font-medium text-gray-700 mb-1">
                 출시일
               </label>
-              <input
-                id="releaseDate"
-                type="date"
-                {...register("releaseDate")}
+              <input id="releaseDate" type="date" {...register("releaseDate")}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -358,39 +373,27 @@ return;
 
   {optionList.map((option, index) => (
     <div key={index} className="grid grid-cols-2 gap-4 mb-4 border p-3 rounded">
-      <input
-        type="text"
-        placeholder="옵션 이름 (예: Red)"
-        value={option.optionName}
+      <input type="text" placeholder="옵션 이름 (예: Red)" value={option.optionName}
         onChange={(e) =>
           handleOptionChange(index, 'optionName', e.target.value)
         }
         className="p-2 border rounded w-full"
       />
-      <input
-        type="text"
-        placeholder="옵션 타입 (예: 색상)"
-        value={option.optionType}
+      <input type="text" placeholder="옵션 타입 (예: 색상)" value={option.optionType}
         onChange={(e) =>
           handleOptionChange(index, 'optionType', e.target.value)
         }
         className="p-2 border rounded w-full"
       />
-      <input
-        type="number"
-        placeholder="추가 가격 (예: 5000)"
-        value={option.additionalPrice}
+      <input type="number" placeholder="추가 가격 (예: 5000)" value={option.additionalPrice}
         onChange={(e) =>
-          handleOptionChange(index, 'additionalPrice', e.target.value)
+          handleOptionChange(index, 'additionalPrice', Number(e.target.value))
         }
         className="p-2 border rounded w-full"
       />
-      <input
-        type="number"
-        placeholder="재고 수량"
-        value={option.stock}
+      <input type="number" placeholder="재고 수량" value={option.stock}
         onChange={(e) =>
-          handleOptionChange(index, 'stock', e.target.value)
+          handleOptionChange(index, 'stock', Number(e.target.value))
         }
         className="p-2 border rounded w-full"
       />

@@ -5,17 +5,17 @@ import { useNavigate } from "react-router-dom"
 
 function ProductCard({ product }) 
 {
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL;
+
   const [isHovered, setIsHovered] = useState(false)
   const navigate = useNavigate();
 
   const isDummy = product.id >= 900;    // 더미상품 기준 조건
 
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL;
-  const imageUrl = isDummy
-    ? product.thumbnailUrl
-    : `${BASE_URL}${product.thumbnailUrl}`.replace(/([^:]\/)\/+/g, "$1");
+  const imageUrl = isDummy ? product.thumbnailUrl : `${BASE_URL}${product.thumbnailUrl}`.replace(/([^:]\/)\/+/g, "$1");
 
-  const formatPrice = (price) => {
+  const formatPrice = (price) => 
+  {
     if (price === null || price === undefined) return "0"
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }

@@ -17,6 +17,7 @@ import dummyProducts from "../../data/dummyProducts"
 const ProductDetail = () => 
 {
   const BASE_URL = process.env.REACT_APP_BACKEND_URL;
+
   const [quantity, setQuantity] = useState(1)
   const [isImageHovered, setIsImageHovered] = useState(false)
 
@@ -27,6 +28,8 @@ const ProductDetail = () =>
   const [currentImage, setCurrentImage] = useState(0); // 현재 선택된 이미지 인덱스
 
   const formatPrice = (num) => num?.toLocaleString() + "원";
+
+  const [options, setOptions] = useState([]);
 
   useEffect(() => 
   {
@@ -56,15 +59,17 @@ const ProductDetail = () =>
       {
         const res = await axios.get(`${BASE_URL}api/products/${id}`);
         setProduct(res.data);
+        setOptions(res.data.options || []);
 
         console.log("📦 가져온 상품:", res.data); // 👈 이거 추가
+        console.log("📦 옵션 목록:", res.data.options);
 
-      // 더미 상품인지 확인
-      const isDummy = res.data.id >= 900; // 더미 상품 ID 조건
+        // 더미 상품인지 확인
+        const isDummy = res.data.id >= 900; // 더미 상품 ID 조건
 
-      const thumbnailUrl = isDummy
-      ? res.data.thumbnailUrl // ex) "/dummy-thumbnail.png"
-      : `${BASE_URL}${res.data.thumbnailUrl.startsWith("/") ? res.data.thumbnailUrl.slice(1) : res.data.thumbnailUrl}`;
+        const thumbnailUrl = isDummy
+        ? res.data.thumbnailUrl // ex) "/dummy-thumbnail.png"
+        : `${BASE_URL}${res.data.thumbnailUrl.startsWith("/") ? res.data.thumbnailUrl.slice(1) : res.data.thumbnailUrl}`;
 
       const subImageUrls = (res.data.subImages || [])
         .filter(Boolean) // null 또는 undefined 제거
@@ -74,7 +79,7 @@ const ProductDetail = () =>
         ? [thumbnailUrl, ...subImageUrls]
         : subImageUrls;
 
-        setImages(allImages);
+      setImages(allImages);
       } 
       catch (error) 
       {
@@ -298,7 +303,7 @@ const ProductDetail = () =>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">원산지</span>
-                <span className="text-gray-700">인도네시아</span>
+                <span className="text-gray-700">{product?.productCountry || "인도네시아"}</span>
               </div>
 
               <div className="flex justify-between items-center">
@@ -309,18 +314,41 @@ const ProductDetail = () =>
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">COLOR</span>
                 <div className="relative">
-                  <select className="border rounded-md px-4 py-2 pr-8 appearance-none bg-white text-gray-700">
+                 <select disabled={options.length === 0} className={`border rounded-md px-4 py-2 pr-8 appearance-none bg-white text-gray-700
+                 ${options.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}>
                     <option>- [필수] 옵션을 선택해 주세요 -</option>
-                    <option>레드</option>
-                    <option>블랙</option>
-                    <option>화이트</option>
+                    {options.map((opt, idx) => (
+                      <option key={idx} value={opt.optionName}>
+                        {opt.optionName} ({opt.optionType}) +{opt.additionalPrice.toLocaleString()}원
+                    </option>
+                    ))}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronRight className="h-4 w-4 text-gray-500" />
-                  </div>
                 </div>
               </div>
             </div>
+
+            {/* 상품 옵션 정보 있을시에만 등장 */}
+{options.length > 0 && (
+  <div className="space-y-3 border-b pb-4-6">
+    <h4 className="text-lg font-semibold mb-2">옵션</h4>
+    <ul className="space-y-2">
+      {options.map((opt, index) => (
+        <li key={index} className="p-3 border rounded shadow-sm">
+          <div><strong>옵션명:</strong> {opt.optionName}</div>
+          <div><strong>타입:</strong> {opt.optionType}</div>
+          <div><strong>추가 가격:</strong> {opt.additionalPrice?.toLocaleString()}원</div>
+          <div><strong>재고:</strong> {opt.stock}</div>
+          <div><strong>품절여부:</strong> {opt.soldOut ? '판매중' : '품절'}</div>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+{options.length === 0 && (
+  <p className="text-gray-500 mt-4">이 상품은 옵션이 없습니다.</p>
+)}
+
+
 
             {/* 카카오톡 문의 */}
             <div className="flex items-center bg-yellow-50 p-3 rounded-md">

@@ -88,6 +88,7 @@ useEffect(() =>
         setLoading(true)  //  로딩 시작(true)
         const response = await axios.get(`${BASE_URL}api/products/${id}`)
         const productData = response.data
+        // const releaseDateStr = productData.releaseDate ? productData.releaseDate.slice(0, 10) : ""; // null방지
 
         setProduct(productData) //  상품 상태 저장 (필요시 썸네일 등)
         setExistingImages(productData.images || []) //  기존의 이미지 배열을 저장
@@ -103,7 +104,7 @@ useEffect(() =>
         setValue("stockTotal", productData.stockTotal);             // 재고수량
         setValue("visible", productData.visible ?? true);      // 진열여부
         setValue("newProduct", productData.newProduct ?? false); // 신상품여부
-        setValue("releaseDate", productData.releaseDate || ""); // 출시일
+        setValue("releaseDate", productData.releaseDate); // 출시일
         setValue("tags", productData.tags || "");                // 태그
         setValue("shippingFee", productData.shippingFee || 0);   // 배송비
         setValue("discountRate", productData.discountRate || 0); // 할인율
@@ -175,7 +176,15 @@ useEffect(() =>
       formData.append("discount", data.discount || false);   // 할인 여부
     
       //  옵션 목록 (빈 배열도 보내야 에러X)
-      formData.append("options", JSON.stringify(optionList || []));
+      // formData.append("options", JSON.stringify(optionList || []));
+      // options: 배열일 경우
+      (optionList || []).forEach((opt, index) => {
+        formData.append(`options[${index}].optionName`, opt.optionName || "")
+        formData.append(`options[${index}].optionType`, opt.optionType || "")
+        formData.append(`options[${index}].additionalPrice`, opt.additionalPrice || 0)
+        formData.append(`options[${index}].stock`, opt.stock || 0)
+        formData.append(`options[${index}].soldOut`, opt.soldOut || false)
+      })
     
       // 삭제할 이미지 ID들 (있을 때만)
       // if (deletedImageIds && deletedImageIds.length > 0) 
@@ -191,8 +200,15 @@ useEffect(() =>
       // 서브이미지 (수정 시 파일 선택했을 때만)
       if (subImages.length > 0) 
       {
-        subImages.forEach((img) => formData.append("subImages", img));
+        if (subImages && Array.isArray(subImages))
+          {
+            subImages.forEach((img) => 
+            {
+              formData.append("subImages", img) // 서브 이미지 여러 장
+            })
+          }
       }
+      
     
       // [디버깅용] 전송 데이터 콘솔로 확인
       for (let [key, value] of formData.entries())
@@ -401,9 +417,7 @@ useEffect(() =>
               <label htmlFor="releaseDate" className="block text-sm font-medium text-gray-700 mb-1">
                 출시일
               </label>
-              <input
-                id="releaseDate"
-                type="date"
+              <input id="releaseDate" type="date"
                 {...register("releaseDate")}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

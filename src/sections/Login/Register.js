@@ -152,9 +152,7 @@ const Register = () => {
                 className={`appearance-none relative block w-full px-3 py-3 border ${!pwValid ? "border-red-300" : "border-gray-300"} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
                 onChange={(e) => validatePassword(e.target.value)}
               />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600" tabIndex="-1"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -215,9 +213,7 @@ const Register = () => {
                 className={`appearance-none relative block w-full px-3 py-3 border ${!pwCheckValid ? "border-red-300" : "border-gray-300"} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
                 onChange={validatePasswordCheck}
               />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600" tabIndex="-1"
                 onClick={() => setShowPasswordCheck(!showPasswordCheck)}
               >
                 {showPasswordCheck ? (

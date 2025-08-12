@@ -10,7 +10,8 @@ import Footer from "../Common/Footer"
 import ProductCard from "../../component/product/product-card"
 import dummyProducts from "../../data/dummyProducts"
 
-function ProductList() {
+function ProductList() 
+{
   const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -18,11 +19,13 @@ function ProductList() {
   const [currentPage, setCurrentPage] = useState(1)
   const productsPerPage = 12
 
-  useEffect(() => {
+  useEffect(() => 
+  {
     // 상품 데이터를 가져오는 함수 (더미 데이터도 섞었음)
     axios
       .get(BASE_URL + "api/products")
-      .then((res) => {
+      .then((res) => 
+      {
         // 더미데이터를 ...로 위에 합쳐줌
         const combined = [...res.data, ...dummyProducts].sort((a, b) => b.id - a.id) // id 기준으로 내림차순 (최신순)
         setProducts(combined)
