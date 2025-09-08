@@ -35,7 +35,7 @@ function ProductList()
         console.error("상품 불러오기 실패", err)
         setLoading(false)
       })
-  }, [])
+  }, [BASE_URL])
 
   // 브랜드 필터링
   const filteredProducts =

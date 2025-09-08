@@ -27,6 +27,9 @@ import OrderManagement from "./sections/Admin/OrderManagement"
 import UserManagement from "./sections/Admin/UserManagement"
 import AdminSettings from "./sections/Admin/AdminSettings"
 
+// 장바구니 페이지
+import Cart from "./sections/Cart/Cart.jsx"
+
 function App() {
   // Aos 초기화
   useEffect(() => {
@@ -47,6 +50,9 @@ function App() {
           <Route path="/product" element={<ProductList />} />
           <Route path="/product/:id" element={<ProductDetail />} />
 
+          {/* 장바구니 페이지 라우트 */}
+          <Route path="/cart" element={<Cart />} />
+
           {/* 관리자 페이지 라우트 */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -56,6 +62,7 @@ function App() {
           <Route path="/admin/orders" element={<OrderManagement />} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+
         </Routes>
 
         {/* 토스트 알림 컴포넌트 */}

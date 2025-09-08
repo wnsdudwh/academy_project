@@ -31,9 +31,8 @@ function ProductCard({ product })
       {/* 상품 이미지 */}
       <div className="relative overflow-hidden bg-gray-100 mb-3 aspect-square">
         <img src={`${imageUrl}`} alt={product.name}
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-300 group-hover:scale-105 w-full h-full"
           sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 25vw"
-          fill
         />
 
         {/* 호버 아이콘 */}
