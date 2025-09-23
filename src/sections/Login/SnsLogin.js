@@ -1,6 +1,10 @@
 import { FcGoogle } from "react-icons/fc"
 
-export default function SocialLogin() {
+export default function SocialLogin() 
+{
+  // 백엔드 서버의 구글 로그인 시작 주소
+  const googleLoginUrl = `${process.env.REACT_APP_BACKEND_URL}oauth2/authorization/google`;
+
   return (
     <div className="w-full max-w-md mx-auto mt-6">
       {/* Divider with "Or" text */}
@@ -8,11 +12,12 @@ export default function SocialLogin() {
       {/* Social Login Buttons */}
       <div className="flex flex-col space-y-3">
         {/* Google Login */}
-        <button className="flex items-center justify-center w-full py-2.5 px-4 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors" 
-        onClick={() => alert("구글 로그인 구현 준비중!")}>
-          <FcGoogle className="w-5 h-5 mr-3" />
-          <span className="text-sm font-medium text-gray-700">Google 로그인</span>
-        </button>
+        <a href={googleLoginUrl}>
+          <button className="flex items-center justify-center w-full py-2.5 px-4 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+            <FcGoogle className="w-5 h-5 mr-3" />
+            <span className="text-sm font-medium text-gray-700">Google 로그인</span>
+          </button>
+        </a>
 
         {/* Kakao Login */}
         <button className="flex items-center justify-center w-full py-2.5 px-4 bg-[#FEE500] rounded-full hover:bg-[#FDD835] transition-colors"

@@ -30,6 +30,9 @@ import AdminSettings from "./sections/Admin/AdminSettings"
 // 장바구니 페이지
 import Cart from "./sections/Cart/Cart.jsx"
 
+// 소셜 로그인
+import OAuthRedirectHandler from "./component/auth/OAuthRedirectHandler.jsx"
+
 function App() {
   // Aos 초기화
   useEffect(() => {
@@ -62,6 +65,9 @@ function App() {
           <Route path="/admin/orders" element={<OrderManagement />} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+
+          {/* 소셜 로그인 라우트 */}
+          <Route path="/oauth-redirect" element={<OAuthRedirectHandler />} />
 
         </Routes>
 
