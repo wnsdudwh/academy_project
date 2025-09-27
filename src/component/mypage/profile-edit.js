@@ -1,31 +1,31 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Plus, Eye, EyeOff } from "lucide-react"
 import ShoppingAddressModal from "./shopping-address-modal"
 import axios from "axios"
-
 import { useLocation, useNavigate } from "react-router-dom";
+
+import { fetchAddresses, addAddress } from "../../api/addressApi";
 
 export default function ProfileEdit ({
   userInfo: propUserInfo,
   onBack,
-  addresses: propAddresses,
-  defaultAddressId: propDefaultAddressId,
-  onAddAddress,
-  onUpdateAddress,
-  onDeleteAddress,
-  onSetDefaultAddress,
+  // addresses: propAddresses,
+  // defaultAddressId: propDefaultAddressId,
+  // onAddAddress,
+  // onUpdateAddress,
+  // onDeleteAddress,
+  // onSetDefaultAddress,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
 
   const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const userInfo = propUserInfo || location.state?.userInfo;
-  const addresses = propAddresses || location.state?.addresses || [];
-  const defaultAddressId = propDefaultAddressId || location.state?.defaultAddressId || null;
 
-  // 이후에 기존 코드 이어서 사용
+  // 주소록 데이터를 prop이 아닌 자체 state로 관리합니다.
+  const [addresses, setAddresses] = useState([]);
 
   // 가져 온 값을 수정 할 때
   const [nickname, setNickname] = useState("");
@@ -44,26 +44,62 @@ export default function ProfileEdit ({
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  const loadAddresses = async () => 
+  {
+    try 
+    {
+      const data = await fetchAddresses();
+      setAddresses(data);
+    }
+    catch (error)
+    {
+      alert("배송지 정보를 불러오는 데 실패했습니다.");
+    }
+  };
+
+  // 컴포넌트가 처음 렌더링될 때 주소록 목록을 불러옵니다.
+  useEffect(() => 
+  {
+    loadAddresses();
+  }, []); // 빈 배열을 전달하여 최초 1회만 실행되도록 설정
+
   const handleBack = () =>
   {
     //이전페이지로 navigate를 이용해서 보내버림
     navigate(-1);
   }
 
-  const handleEditAddress = (address) => 
-  {
-    setEditingAddress(address)
-    setShowAddressModal(true)
-  }
+  // const handleEditAddress = (address) => 
+  // {
+  //   setEditingAddress(address)
+  //   setShowAddressModal(true)
+  // }
 
-  const handleSaveAddress = (updatedAddress) => {
-    if (editingAddress) {
-      onUpdateAddress({ ...updatedAddress, id: editingAddress.id })
-    } else {
-      onAddAddress(updatedAddress)
+  const handleSaveAddress = async (addressDataFromModal) => 
+  {
+      try 
+      {
+      if (editingAddress) 
+      {
+        // (추후 구현) 수정 로직: await updateAddress(editingAddress.id, addressDataFromModal);
+        alert("수정 기능은 구현 예정입니다.");
+      }
+      else
+      {
+        // 추가 요청만 하고 결과는 받지 않음
+        await addAddress(addressDataFromModal);
+
+        // 추가 성공 후, 목록 전체를 다시 불러옴
+        await loadAddresses();
+        alert("새 배송지가 등록되었습니다.");
+      }
+      setShowAddressModal(false);
+      setEditingAddress(null);
     }
-    setShowAddressModal(false)
-    setEditingAddress(null)
+    catch (error)
+    {
+      alert("배송지 저장에 실패했습니다.");
+    }
   }
 
 // 닉네임 변경 제출 함수
@@ -88,7 +124,7 @@ const handleSubmitNickname = async () =>
       const token = localStorage.getItem("token"); // 🔐 로컬 스토리지에서 토큰 꺼냄
   
       // 🔁 닉네임 변경 요청 (백엔드로 PUT 요청 전송)
-      const response = await axios.put(BASE_URL + "auth/mypage/update",
+      await axios.put(BASE_URL + "auth/mypage/update",
       {
         nickname: nickname  // ✏️ 변경할 닉네임 (상태값)
       },
@@ -164,7 +200,7 @@ const handleNicknameCheck = async () =>
       const token = localStorage.getItem("token");
 
       // 3. 서버에 저장 요청
-      const response = await axios.put(BASE_URL + "auth/mypage/update-phone",
+      await axios.put(BASE_URL + "auth/mypage/update-phone",
       {
         phone : phone
       },
@@ -506,10 +542,11 @@ const handleNicknameCheck = async () =>
   }
 
   // 배송지 관리 섹션
-  const renderAddressSection = () => {
+  const renderAddressSection = () =>
+  {
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold">배송지 관리</h2>
+        <h2 className="text-xl font-semibold">배송지 관리 ({addresses.length}/10)</h2>
 
         {addresses.length > 0 ? (
           <div className="space-y-4">
@@ -519,36 +556,36 @@ const handleNicknameCheck = async () =>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{address.name}</span>
-                      {address.isDefault && (
+                      {address.default && (
                         <span className="bg-rose-600 text-white text-xs px-2 py-0.5 rounded">기본</span>
                       )}
                     </div>
                     <p className="text-sm mt-1">
-                      {address.recipient} | {address.phone}
+                      {address.recipient} | {address.phoneNumber}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      ({address.zipcode}) {address.address1} {address.address2}
+                      ({address.zipCode}) {address.address} {address.detailAddress}
                     </p>
                   </div>
                   <div className="flex gap-2">
                     <button
                       className="text-sm px-2 py-1 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded transition-colors"
-                      onClick={() => handleEditAddress(address)}
+                      // onClick={() => handleEditAddress(address)}
                     >
                       수정
                     </button>
                     <button
                       className="text-sm px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-                      onClick={() => onDeleteAddress(address.id)}
+                      // onClick={() => onDeleteAddress(address.id)}
                     >
                       삭제
                     </button>
                   </div>
                 </div>
-                {!address.isDefault && (
+                {!address.default && (
                   <button
                     className="mt-3 text-sm text-rose-500 hover:text-rose-700"
-                    onClick={() => onSetDefaultAddress(address.id)}
+                    // onClick={() => onSetDefaultAddress(address.id)}
                   >
                     기본 배송지로 설정
                   </button>
@@ -562,16 +599,19 @@ const handleNicknameCheck = async () =>
           </div>
         )}
 
-        <button
-          className="flex items-center justify-center w-full py-3 border border-dashed border-rose-300 rounded-lg hover:bg-rose-50 transition-colors text-rose-600"
-          onClick={() => {
-            setEditingAddress(null)
-            setShowAddressModal(true)
-          }}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          배송지 추가
-        </button>
+        {/* 배송지가 10개 이하일때만 표시  */}
+        {addresses.length < 10 && (
+          <button
+            className="flex items-center justify-center w-full py-3 border border-dashed border-rose-300 rounded-lg hover:bg-rose-50 transition-colors text-rose-600"
+            onClick={() => {
+              setEditingAddress(null)
+              setShowAddressModal(true)
+            }}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            배송지 추가
+          </button>
+        )}
 
         <div className="flex justify-end gap-3 mt-6">
           <button
