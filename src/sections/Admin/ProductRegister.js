@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance"
 import ImagePreview from "./ImagePreview"
 import { toast } from "react-hot-toast"
 import { Loader2 } from "lucide-react"
 import AdminLayout from "./AdminLayout"
 
-const ProductRegister = () => {
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL
+const ProductRegister = () => 
+{
   const navigate = useNavigate()
   const { register, handleSubmit, reset, formState: { errors }, } = useForm()
   const [thumbnail, setThumbnail] = useState(null)
@@ -44,11 +44,11 @@ const ProductRegister = () => {
 
   useEffect(() =>
   {
-    axios.get(`${BASE_URL}api/brand`)
+    axiosInstance.get('/api/brand')
     .then(res => setBrandList(res.data))
     .catch(err => console.error("브랜드 목록 로딩 실패 : ", err));
 
-    axios.get(`${BASE_URL}api/category`)
+    axiosInstance.get('api/category')
     .then(res => setCategoryList(res.data))
     .catch(err => console.error("카테고리 ㅣ목록 로딩 실패 : ", err))
   }, []);
@@ -72,7 +72,8 @@ const ProductRegister = () => {
   {
     setIsSubmitting(true)
     // 썸네일 미선택 시 사용자에게 경고
-    if (!thumbnail) {
+    if (!thumbnail)
+    {
       toast.error("썸네일 이미지를 선택해주세요!")
       setIsSubmitting(false)
       return // 등록 진행 막기
@@ -162,7 +163,7 @@ const ProductRegister = () => {
       }
 
       // API 호출 form 전송
-      const response = await axios.post(`${BASE_URL}api/products/register`, formData, {
+      const response = await axiosInstance.post('api/products/register', formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -509,7 +510,7 @@ const ProductRegister = () => {
               {...register("shortDescription", { required: "상품 설명은 필수입니다" })}
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="상품에 대한 상세 설명을 입력하세요" maxlength="500"
+              placeholder="상품에 대한 상세 설명을 입력하세요" maxLength="500"
             ></textarea>
             {errors.shortDescription && <p className="mt-1 text-sm text-red-600">{errors.shortDescription.message}</p>}
           </div>
