@@ -49,3 +49,53 @@ export const addAddress = async (addressData) =>
     throw error;
   }
 };
+
+/**
+ * 특정 주소록을 수정하는 API
+ * PUT /api/addresses/{addressId}
+ * @param {number} addressId - 수정할 주소의 ID
+ * @param {object} addressData - 수정할 주소 정보
+ */
+export const updateAddress = async (addressId, addressData) =>
+{
+  // 프론트엔드 데이터 key를 백엔드 DTO key에 맞게 변환
+  const payload =
+  {
+    name: addressData.name,
+    recipient: addressData.recipient,
+    address: addressData.address1,
+    detailAddress: addressData.address2,
+    zipCode: addressData.zipcode,
+    phoneNumber: addressData.phone,
+    isDefault: addressData.isDefault,
+  };
+
+  try
+  {
+    const response = await axiosInstance.put(`/api/addresses/${addressId}`, payload);
+    return response.data;
+  }
+  catch (error)
+  {
+    console.error("주소록 수정에 실패했습니다.", error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 주소록을 삭제하는 API
+ * DELETE /api/addresses/{addressId}
+ * @param {number} addressId - 삭제할 주소의 ID
+ */
+export const deleteAddress = async (addressId) =>
+{
+  try
+  {
+    await axiosInstance.delete(`/api/addresses/${addressId}`);
+  }
+  catch (error)
+  {
+    console.error("주소록 삭제에 실패했습니다.", error);
+    throw error;
+  }
+};

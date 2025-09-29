@@ -6,7 +6,7 @@ import ShoppingAddressModal from "./shopping-address-modal"
 import axios from "axios"
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { fetchAddresses, addAddress } from "../../api/addressApi";
+import { fetchAddresses, addAddress, updateAddress, deleteAddress } from "../../api/addressApi";
 
 export default function ProfileEdit ({
   userInfo: propUserInfo,
@@ -69,11 +69,23 @@ export default function ProfileEdit ({
     navigate(-1);
   }
 
-  // const handleEditAddress = (address) => 
-  // {
-  //   setEditingAddress(address)
-  //   setShowAddressModal(true)
-  // }
+  const handleEditAddress = (address) => 
+  {
+    // API 응답 데이터(phoneNumber 등)와 모달에서 사용하는 데이터(phone 등)의 이름이 다르므로 변환해줍니다.
+    const addressForModal = 
+    {
+      id: address.id,
+      name: address.name,
+      recipient: address.recipient,
+      phone: address.phoneNumber,
+      zipcode: address.zipCode,
+      address1: address.address,
+      address2: address.detailAddress,
+      isDefault: address.default,
+    };
+    setEditingAddress(addressForModal);
+    setShowAddressModal(true);
+  };
 
   const handleSaveAddress = async (addressDataFromModal) => 
   {
@@ -81,16 +93,16 @@ export default function ProfileEdit ({
       {
       if (editingAddress) 
       {
-        // (추후 구현) 수정 로직: await updateAddress(editingAddress.id, addressDataFromModal);
-        alert("수정 기능은 구현 예정입니다.");
+        // '수정' 로직
+        await updateAddress(editingAddress.id, addressDataFromModal);
+        await loadAddresses(); // 목록 새로고침
+        alert("배송지가 수정되었습니다.");
       }
       else
       {
-        // 추가 요청만 하고 결과는 받지 않음
+        // '추가' 로직
         await addAddress(addressDataFromModal);
-
-        // 추가 성공 후, 목록 전체를 다시 불러옴
-        await loadAddresses();
+        await loadAddresses(); // 목록 새로고침
         alert("새 배송지가 등록되었습니다.");
       }
       setShowAddressModal(false);
@@ -101,6 +113,24 @@ export default function ProfileEdit ({
       alert("배송지 저장에 실패했습니다.");
     }
   }
+
+  // ⭐️ 4. handleDeleteAddress 함수를 새로 만듭니다.
+  const handleDeleteAddress = async (addressId) => 
+  {
+    if (window.confirm("정말 이 배송지를 삭제하시겠습니까?"))
+    {
+      try
+      {
+        await deleteAddress(addressId);
+        await loadAddresses(); // 목록 새로고침
+        alert("배송지가 삭제되었습니다.");
+      }
+      catch (error)
+      {
+        alert("배송지 삭제에 실패했습니다.");
+      }
+    }
+  };
 
 // 닉네임 변경 제출 함수
 const handleSubmitNickname = async () => 
@@ -544,52 +574,54 @@ const handleNicknameCheck = async () =>
   // 배송지 관리 섹션
   const renderAddressSection = () =>
   {
+    //    렌더링 직전에 주소록 배열을 복사하여 정렬합니다.
+    //    b.default가 true(1)이면 a.default가 false(0)일 때보다 앞으로 오게 됩니다.
+    const sortedAddresses = [...addresses].sort((a, b) => b.default - a.default);
+    
     return (
       <div className="space-y-6">
         <h2 className="text-xl font-semibold">배송지 관리 ({addresses.length}/10)</h2>
 
         {addresses.length > 0 ? (
           <div className="space-y-4">
-            {addresses.map((address) => (
-              <div key={address.id} className="p-4 border border-gray-200 rounded-lg relative">
+            {sortedAddresses.map((address) => (
+              <div key={address.id} className={`p-4 border rounded-lg relative transition-colors
+                ${address.default
+                  ? 'border-gray-400 bg-gray-100' // 기본 배송지일 때 스타일
+                  : 'border-gray-200'           // 아닐 때 스타일
+                }`}
+              >
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{address.name}</span>
                       {address.default && (
-                        <span className="bg-rose-600 text-white text-xs px-2 py-0.5 rounded">기본</span>
+                        <span className="bg-indigo-600 text-white text-xs px-2 py-0.5 rounded">기본</span>
                       )}
                     </div>
                     <p className="text-sm mt-1">
                       {address.recipient} | {address.phoneNumber}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      ({address.zipCode}) {address.address} {address.detailAddress}
+                      {address.address} {address.detailAddress}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      ({address.zipCode})
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <button
-                      className="text-sm px-2 py-1 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded transition-colors"
-                      // onClick={() => handleEditAddress(address)}
+                    <button className="text-sm px-2 py-1 bg-sky-100 text-sky-700 hover:bg-sky-200 rounded transition-colors"
+                      onClick={() => handleEditAddress(address)}
                     >
                       수정
                     </button>
-                    <button
-                      className="text-sm px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-                      // onClick={() => onDeleteAddress(address.id)}
+                    <button className="text-sm px-2 py-1 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded transition-colors"
+                      onClick={() => handleDeleteAddress(address.id)}
                     >
                       삭제
                     </button>
                   </div>
                 </div>
-                {!address.default && (
-                  <button
-                    className="mt-3 text-sm text-rose-500 hover:text-rose-700"
-                    // onClick={() => onSetDefaultAddress(address.id)}
-                  >
-                    기본 배송지로 설정
-                  </button>
-                )}
               </div>
             ))}
           </div>
