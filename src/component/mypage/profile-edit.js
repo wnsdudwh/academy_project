@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { ArrowLeft, Plus, Eye, EyeOff } from "lucide-react"
 import ShoppingAddressModal from "./shopping-address-modal"
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance"
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { fetchAddresses, addAddress, updateAddress, deleteAddress } from "../../api/addressApi";
@@ -21,7 +21,6 @@ export default function ProfileEdit ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const userInfo = propUserInfo || location.state?.userInfo;
 
   // 주소록 데이터를 prop이 아닌 자체 state로 관리합니다.
@@ -151,18 +150,10 @@ const handleSubmitNickname = async () =>
 
     try 
     {
-      const token = localStorage.getItem("token"); // 🔐 로컬 스토리지에서 토큰 꺼냄
-  
       // 🔁 닉네임 변경 요청 (백엔드로 PUT 요청 전송)
-      await axios.put(BASE_URL + "auth/mypage/update",
+      await axiosInstance.put("/auth/mypage/update",
       {
         nickname: nickname  // ✏️ 변경할 닉네임 (상태값)
-      },
-      {
-        headers: 
-        {
-          Authorization: `Bearer ${token}` // 🛡️ 인증 헤더에 토큰 포함
-        }
       });
   
       alert("닉네임이 성공적으로 변경되었습니다!");
@@ -186,7 +177,7 @@ const handleNicknameCheck = async () =>
   // 중복 아니고 확인도 했으면 PATCH 요청
   try 
   {
-    const response = await axios.get(BASE_URL + `auth/check-nickname?nickname=${nickname}`);
+    const response = await axiosInstance.get(`/auth/check-nickname?nickname=${nickname}`);
     const available = response.data;
 
     if (available)
@@ -227,18 +218,10 @@ const handleNicknameCheck = async () =>
 
     try 
     {
-      const token = localStorage.getItem("token");
-
       // 3. 서버에 저장 요청
-      await axios.put(BASE_URL + "auth/mypage/update-phone",
+      await axiosInstance.put("/auth/mypage/update-phone",
       {
         phone : phone
-      },
-      {
-        headers : 
-        {
-          Authorization : `Bearer ${token}`
-        }
       });
       alert("연락처가 성공적으로 변경되었습니다!");
       window.location.reload();  // 🔄 변경된 값 즉시 반영을 위해 새로고침

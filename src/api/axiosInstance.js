@@ -8,7 +8,8 @@ const getAuthToken = () =>
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL, // 백엔드 서버 주소 (환경변수)
+  // baseURL: process.env.REACT_APP_BACKEND_URL, // 백엔드 서버 주소 (환경변수)
+  baseURL: "/",
 });
 
 // 요청 인터셉터 추가

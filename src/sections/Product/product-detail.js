@@ -11,13 +11,11 @@ import ProductTabs from "../../component/product/product-tabs"
 import Sidebar from "../Common/Sidebar"
 import ServiceForm from "../Common/service-form"
 import Footer from "../Common/Footer"
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance"
 import dummyProducts from "../../data/dummyProducts"
 
 const ProductDetail = () => 
 {
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL;
-
   const [quantity, setQuantity] = useState(1)
   const [isImageHovered, setIsImageHovered] = useState(false)
 
@@ -57,7 +55,7 @@ const ProductDetail = () =>
 
       try 
       {
-        const res = await axios.get(`${BASE_URL}api/products/${id}`);
+        const res = await axiosInstance.get(`/api/products/${id}`);
         setProduct(res.data);
         setOptions(res.data.options || []);
 
@@ -67,23 +65,23 @@ const ProductDetail = () =>
         // 더미 상품인지 확인
         const isDummy = res.data.id >= 900; // 더미 상품 ID 조건
 
-        const thumbnailUrl = isDummy
-        ? res.data.thumbnailUrl // ex) "/dummy-thumbnail.png"
-        : `${BASE_URL}${res.data.thumbnailUrl.startsWith("/") ? res.data.thumbnailUrl.slice(1) : res.data.thumbnailUrl}`;
+        const thumbnailUrl = res.data.thumbnailUrl;
+        const subImageUrls = res.data.subImages || [];
+        const allImages = [thumbnailUrl, ...subImageUrls];
 
-      const subImageUrls = (res.data.subImages || [])
-        .filter(Boolean) // null 또는 undefined 제거
-        .map(url => isDummy ? url : `${BASE_URL}${url.startsWith("/") ? url.slice(1) : url}`);
-
-      const allImages = thumbnailUrl
-        ? [thumbnailUrl, ...subImageUrls]
-        : subImageUrls;
-
-      setImages(allImages);
+        setImages(allImages);
       } 
       catch (error) 
       {
         console.error("상품 로딩 실패", error);
+        // ⭐️ 에러 발생 시 ID 999번 더미 데이터를 대신 보여줍니다.
+        const dummy = dummyProducts.find(p => p.id === 999);
+        if (dummy) 
+        {
+            const fullImages = [dummy.thumbnailUrl, ...dummy.subImages];
+            setProduct(dummy);
+            setImages(fullImages);
+        }
       }
     };
     fetchProduct();

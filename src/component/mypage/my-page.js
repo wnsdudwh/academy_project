@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance"
 import {
   ShoppingBag,
   Heart,
@@ -19,8 +19,8 @@ import ProfileEdit from "./profile-edit"
 import ShoppingAddressModal from "./shopping-address-modal"
 import { useNavigate } from "react-router-dom"
 
-export default function MyPage() {
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL
+export default function MyPage() 
+{
   const [userInfo, setUserInfo] = useState(null)
   const [activeTab, setActiveTab] = useState("profile")
   const [isLoading, setIsLoading] = useState(true)
@@ -28,17 +28,14 @@ export default function MyPage() {
   const [addresses, setAddresses] = useState([])
   const [defaultAddressId, setDefaultAddressId] = useState(null)
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
+  useEffect(() => 
+  {
+    const fetchUserData = async () => 
+    {
+      try 
+      {
         setIsLoading(true)
-        const token = localStorage.getItem("token")
-
-        const response = await axios.get(BASE_URL + "auth/mypage", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const response = await axiosInstance.get("/auth/mypage");
 
         // 실제 서비스에서는 이런 데이터가 추가로 있을 것입니다
         const enhancedData = {
@@ -302,8 +299,7 @@ export default function MyPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">최근 주문 내역</h3>
-          <a
-            href="#"
+          <a href="#"
             className="text-sm text-gray-500 hover:text-black flex items-center"
             onClick={(e) => {
               e.preventDefault()

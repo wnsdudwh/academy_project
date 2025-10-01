@@ -61,7 +61,7 @@ const ShoppingAddressModal = ({ onClose, onSave, address = null, existingAddress
     alert("주소 검색 기능은 실제 구현 시 Daum 우편번호 서비스 등을 연동해주세요.")
     // 임시 데이터
     setZipcode("37764")
-    setAddress1("경상북도 포항시 남구 중흥로162번길 37-6 (상도동, 펠리하우스)")
+    setAddress1("경상북도 포항시 남구 중흥로162번길 37-6 (상도동, 웰빙하우스)")
   }
 
   return (

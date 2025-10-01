@@ -3,7 +3,7 @@ import { FcGoogle } from "react-icons/fc"
 export default function SocialLogin() 
 {
   // 백엔드 서버의 구글 로그인 시작 주소
-  const googleLoginUrl = `${process.env.REACT_APP_BACKEND_URL}oauth2/authorization/google`;
+  const googleLoginUrl = "/oauth2/authorization/google";
 
   return (
     <div className="w-full max-w-md mx-auto mt-6">

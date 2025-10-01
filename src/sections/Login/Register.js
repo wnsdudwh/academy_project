@@ -1,11 +1,10 @@
 "use client"
 
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance"
 import { useRef, useState } from "react"
 
-const Register = () => {
-  const server = process.env.REACT_APP_BACKEND_URL
-
+const Register = () => 
+{
   const idRef = useRef(null)
   const pwRef = useRef(null)
   const pwCheckRef = useRef(null)
@@ -34,16 +33,23 @@ const Register = () => {
       return
     }
 
-    try {
-      const resp = await axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/check-nickname?nickname=${nickname}`)
-      if (resp.data === true) {
+    try 
+    {
+      const resp = await axiosInstance.get(`/auth/check-nickname?nickname=${nickname}`)
+
+      if (resp.data === true) 
+      {
         setNicknameMsg("사용 가능한 닉네임입니다.")
         setIsNickAvailable(true)
-      } else {
+      }
+      else
+    {
         setNicknameMsg("이미 사용 중인 닉네임입니다.")
         setIsNickAvailable(false)
       }
-    } catch (err) {
+    }
+    catch (err)
+    {
       setNicknameMsg("서버 에러 발생")
       setIsNickAvailable(false)
       console.error(err)
@@ -90,8 +96,9 @@ const Register = () => {
     if (!isNickAvailable) return setErrorMsg("닉네임 중복 확인을 해주세요.") // 닉네임 중복 감지. 별도로 빼서 주석해둠.
 
     // 2. 전송
-    axios
-      .post(server + "auth/register", {
+    axiosInstance
+      .post("/auth/register",
+      {
         userid: id,
         userpw: pw,
         username: name,

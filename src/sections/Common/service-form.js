@@ -7,7 +7,7 @@ const ServiceForm = () => {
         </div>
       ),
       title: "고객 문의",
-      description: "기타네트 카카오톡 채널을 이용해주세요.",
+      description: "기타하우스 카카오톡 채널을 이용해주세요.",
     },
     {
       icon: (
@@ -22,7 +22,7 @@ const ServiceForm = () => {
           </svg>
         </div>
       ),
-      title: "기타네트 유튜브",
+      title: "기타하우스 유튜브",
       description: "다양한 기타리스트와 기타들을 만나보세요!",
     },
     {
@@ -43,7 +43,7 @@ const ServiceForm = () => {
         </div>
       ),
       title: "신규 회원 혜택",
-      description: "회원가입시 적립금 추론제공",
+      description: "회원가입시 적립금 추가제공",
     },
     {
       icon: (
@@ -62,8 +62,8 @@ const ServiceForm = () => {
           </svg>
         </div>
       ),
-      title: "기타네트 오프라인 쇼룸",
-      description: "직상의 현다화와 최고의 서비스.",
+      title: "기타하우스 오프라인 쇼룸",
+      description: "최상의 컨디션과 최상의 서비스",
     },
   ]
 

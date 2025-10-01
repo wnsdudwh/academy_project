@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { Link, useParams } from "react-router-dom"
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance"
 import { Edit, Trash2, Search, RefreshCw, Plus, Eye, EyeOff, Star } from "lucide-react"
 import { toast } from "react-hot-toast"
 import AdminLayout from "./AdminLayout"
 
 const AdminProductList = () => 
 {
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const { id } = useParams(); //URL에서 상품 ID 추출
   const [product, setProduct] = useState(null);
 
@@ -42,11 +41,11 @@ const AdminProductList = () =>
 
   useEffect(() =>
   {
-      axios.get(`${BASE_URL}api/brand`)
+      axiosInstance.get("/api/brand")
       .then(res => setBrandList(res.data))
       .catch(err => console.error("브랜드 목록 로딩 실패 : ", err));
   
-      axios.get(`${BASE_URL}api/category`)
+      axiosInstance.get("api/category")
       .then(res => setCategoryList(res.data))
       .catch(err => console.error("카테고리 목록 로딩 실패 : ", err))
     }, []);
@@ -56,7 +55,7 @@ const AdminProductList = () =>
       // 디버깅용  (id 체크 방어코드, 상품 목록에서 에러가 자꾸떠서 넣음 -> 상세페이지 선 api호출 방지)
       if (!id) return;
 
-      axios.get(`${BASE_URL}api/products/${id}`)
+      axiosInstance.get("api/products/${id}")
         .then((res) => {
           setProduct(res.data); // ✅ 백엔드 응답으로 product 정보 설정
         })
@@ -72,7 +71,7 @@ const AdminProductList = () =>
     try 
     {
       setLoading(true)
-      const response = await axios.get(`${BASE_URL}api/products`)
+      const response = await axiosInstance.get("/api/products")
       setProducts(response.data)
       setError(null)
       console.log("🧪 상품 데이터:", response.data);
@@ -107,7 +106,7 @@ const AdminProductList = () =>
     {
       try 
       {
-        await axios.put(`${BASE_URL}api/products/${productId}/soft-delete`)
+        await axiosInstance.put(`/api/products/${productId}/soft-delete`)
         toast.success("상품이 성공적으로 삭제처리 되었습니다.")
         fetchProducts() // 목록 새로고침
       } 
@@ -124,7 +123,7 @@ const AdminProductList = () =>
   {
     try 
     {
-      await axios.put(`${BASE_URL}api/products/${productId}/status`, { status: newStatus })
+      await axiosInstance.put(`/api/products/${productId}/status`, { status: newStatus })
       setProducts((prev) =>
         prev.map((product) => (product.id === productId ? { ...product, status: newStatus } : product)),
       )
@@ -141,7 +140,7 @@ const AdminProductList = () =>
     try 
     {
       const newVisibility = !currentVisibility
-      await axios.put(`${BASE_URL}api/products/${productId}/visibility`, { visible: newVisibility })
+      await axiosInstance.put(`/api/products/${productId}/visibility`, { visible: newVisibility })
       setProducts((prev) =>
         prev.map((product) => (product.id === productId ? { ...product, visible: newVisibility } : product)),
       )
@@ -370,7 +369,7 @@ const AdminProductList = () =>
                       <tr key={product.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="w-16 h-16 rounded-md overflow-hidden border border-gray-200 flex-shrink-0">
-                            <img src={`${BASE_URL.replace(/\/$/, '')}${product.thumbnailUrl}`}
+                            <img src={product.thumbnailUrl}
                               alt={product.name}
                               className="w-full h-full object-cover"
                             />

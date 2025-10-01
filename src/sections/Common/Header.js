@@ -13,7 +13,8 @@ const Header = () =>
   const userRole = localStorage.getItem("userRole") || "ROLE_GUEST";  // 권한 가져오기 및 기본값 처리
 
   // 스크롤 감지
-  useEffect(() => {
+  useEffect(() => 
+  {
     const handleScroll = () => {
       if (window.scrollY > 10) {
         setIsScrolled(true)
@@ -51,7 +52,7 @@ const Header = () =>
         {/* 로고 영역 */}
         <div className="logo-zone basis-1/4">
           <a href="/">
-            <h1 className="text-2xl font-bold text-primary-700">GuitarShop</h1>
+            <h1 className="text-2xl font-bold text-primary-700">GuitarHouse</h1>
           </a>
         </div>
 

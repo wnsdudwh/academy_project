@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance"
+
 // static
 import Header from "../Common/Header"
 import Navbar from "../Common/Navbar"
@@ -12,7 +13,6 @@ import dummyProducts from "../../data/dummyProducts"
 
 function ProductList() 
 {
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentBrand, setCurrentBrand] = useState("전체")
@@ -22,8 +22,7 @@ function ProductList()
   useEffect(() => 
   {
     // 상품 데이터를 가져오는 함수 (더미 데이터도 섞었음)
-    axios
-      .get(BASE_URL + "api/products")
+    axiosInstance.get("/api/products")
       .then((res) => 
       {
         // 더미데이터를 ...로 위에 합쳐줌
@@ -35,7 +34,7 @@ function ProductList()
         console.error("상품 불러오기 실패", err)
         setLoading(false)
       })
-  }, [BASE_URL])
+  }, []);
 
   // 브랜드 필터링
   const filteredProducts =

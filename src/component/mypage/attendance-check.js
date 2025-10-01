@@ -1,15 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import axiosInstance from "../../api/axiosInstance"
+import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 const AttendanceCheck = () => 
 {
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [currentDate, setCurrentDate] = useState(new Date())
   const [attendanceDates, setAttendanceDates] = useState([])
   const [loading, setLoading] = useState(true)
-
   const navigate = useNavigate();
 
   const handleGoBack = () =>
@@ -53,108 +52,56 @@ const AttendanceCheck = () =>
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))
   }
 
-  // 출석 데이터 가져오기
-  useEffect(() => {
-    const fetchAttendanceData = async () => 
-    {
-      setLoading(true)
-      try 
-      {
-        const token = localStorage.getItem("token")
-        if (!token) 
-        {
-          setLoading(false)
-          return
-        }
-
-        // 현재 보고 있는 연월에 해당하는 출석 데이터를 가져옵니다
-        const year = currentDate.getFullYear()
-        const month = currentDate.getMonth() + 1
-
-        const response = await fetch(`${BASE_URL}attendance/list?year=${year}&month=${month}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        if (response.ok) 
-        {
-          const data = await response.json()
-          setAttendanceDates(data.dates)
-        }
-      } catch (error) {
-        console.error("출석 데이터를 가져오는 중 오류 발생:", error)
-      } finally {
+  // 출석 데이터 가져오기 함수 (useEffect에서 분리하여 재사용)
+  const fetchAttendanceData = useCallback(async () => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
         setLoading(false)
+        return
       }
-    }
+      const year = currentDate.getFullYear()
+      const month = currentDate.getMonth() + 1
 
-    fetchAttendanceData()
-  }, [currentDate])
+      // ⭐️ 2. fetch 대신 axiosInstance.get 사용
+      const response = await axiosInstance.get('/attendance/list', {
+        params: { year, month }
+      });
+      setAttendanceDates(response.data.dates);
+
+    } catch (error) {
+      console.error("출석 데이터를 가져오는 중 오류 발생:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [currentDate]);
+
+  // 달이 변경될 때마다 출석 데이터를 다시 가져옵니다.
+  useEffect(() => {
+    fetchAttendanceData();
+  }, [fetchAttendanceData]);
 
   // 출석 체크 함수
   const handleAttendanceCheck = async () => 
   {
-    const token = localStorage.getItem("token")
-
-    // 💛 비로그인 상태면 알림 띄우고 함수 종료 어떤 식으로든 나가게함.
-    if (!token) 
+    try 
     {
-      const confirmLogin = window.confirm("로그인 후 출석체크를 해 주세요. 로그인 하시겠습니까?");
-      if (confirmLogin) 
-      {
-        navigate("/login"); // 로그인 페이지로 이동
-      }
-      else 
-      {
-        navigate("/"); // 메인 페이지로 이동
-      }
-      return;
-    }
+      // ⭐️ fetch가 아닌 axiosInstance.post를 사용.
+      // 이제 더 이상 token, headers, method 등을 직접 쓸 필요가 없습니다. (axiosInstance 활용)
+      const response = await axiosInstance.post('/attendance/check');
 
-    try
+      // ⭐️ Axios는 응답 데이터를 .data에 담아줍니다. .text()가 아닙니다.
+      alert(response.data);
+
+      // ⭐️ 출석 성공 또는 중복 후 달력 새로고침
+      await fetchAttendanceData();
+    }
+    catch (error)
     {
-      // ✅ 출석 체크 API 호출
-      const response = await fetch(BASE_URL + "attendance/check", 
-      {
-        method: "POST",
-        headers: 
-        {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      const message = await response.text();
-
-      // 여기서 모든 응답을 message로 받고 판단
-      alert(message); 
-
-      if (response.ok)
-      {
-        navigate("/");
-      }
-
-    // 출석 성공 또는 중복 후에도 달력 새로고침
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth() + 1;
-
-    const listResponse = await fetch(BASE_URL + `attendance/list?year=${year}&month=${month}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (listResponse.ok) {
-      const data = await listResponse.json();
-      setAttendanceDates(data.dates);
+      console.error("출석 체크 중 오류 발생:", error);
+      alert(error.response?.data || "서버와의 연결 중 오류가 발생했습니다.");
     }
-  }
-  catch (error)
-  {
-    console.error("완전한 서버 연결 실패 또는 CORS 등 네트워크 문제", error);
-      // 진짜 네트워크 예외만 처리
-    alert("서버와의 연결 중 오류가 발생했습니다.")
-  }
   }
 
   // 달력 생성 함수

@@ -1,5 +1,5 @@
 "use client"
-import axios from "axios"
+import axiosInstance from "../../api/axiosInstance";
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -13,7 +13,6 @@ import "../../static/css/boardLogin.css"
 
 const Login = () => 
 {
-  const BASE_URL = process.env.REACT_APP_BACKEND_URL
   const [userid, setUserid] = useState("")
   const [userpw, setUserpw] = useState("")
   const navigate = useNavigate()
@@ -22,7 +21,7 @@ const Login = () =>
     e.preventDefault()
 
     try {
-      const response = await axios.post(BASE_URL + "auth/login", {
+      const response = await axiosInstance.post("/auth/login", {
         userid,
         userpw,
       })
