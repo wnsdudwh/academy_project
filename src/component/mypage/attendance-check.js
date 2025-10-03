@@ -24,8 +24,39 @@ const AttendanceCheck = () =>
       {
           alert("로그인이 필요한 페이지입니다.");
           navigate("/login");
+          return; // 토큰이 없으면 실행 중단
       }
-  }, [navigate]);
+
+      
+  // 토큰이 있는 경우 출석 데이터 가져오기 함수 호출
+  const fetchAttendanceData = async () => 
+  {
+    setLoading(true);
+    try 
+    {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+
+      //  fetch 대신 axiosInstance.get 사용
+      const response = await axiosInstance.get('/api/attendance/list',
+      {
+        params: { year, month }
+      });
+
+      setAttendanceDates(response.data.dates || []);
+    }
+    catch (error)
+    {
+      console.error("출석 데이터를 가져오는 중 오류 발생:", error);
+      setAttendanceDates([]);
+    }
+    finally
+    {
+      setLoading(false);
+    }
+  };
+  fetchAttendanceData();
+}, [currentDate, navigate]);
 
   // 커스텀 애니메이션 스타일
   const animationStyle = `
@@ -52,35 +83,6 @@ const AttendanceCheck = () =>
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))
   }
 
-  // 출석 데이터 가져오기 함수 (useEffect에서 분리하여 재사용)
-  const fetchAttendanceData = useCallback(async () => 
-  {
-    setLoading(true)
-    try 
-    {
-      const year = currentDate.getFullYear()
-      const month = currentDate.getMonth() + 1
-
-      // ⭐️ 2. fetch 대신 axiosInstance.get 사용
-      const response = await axiosInstance.get('/api/attendance/list',
-      {
-        params: { year, month }
-      });
-
-      // 👇 [추가] 서버가 실제로 무엇을 보냈는지 확인하기 위한 로그
-      console.log('서버로부터 받은 실제 응답:', response.data);
-
-      setAttendanceDates(response.data.dates || []);
-    }
-    catch (error)
-    {
-      console.error("출석 데이터를 가져오는 중 오류 발생:", error)
-    }
-    finally
-    {
-      setLoading(false)
-    }
-  }, [currentDate]);
 
   // 출석 체크 함수
   const handleAttendanceCheck = async () => 
