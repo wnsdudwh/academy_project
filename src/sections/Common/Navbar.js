@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Pagination, Autoplay } from "swiper/modules"
+import { Link } from "react-router-dom"
 import "swiper/css"
 import "swiper/css/pagination"
 import "../../static/css/Navbar.css"
@@ -332,36 +333,36 @@ const Navbar = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">{menu?.name}</h3>
                 <ul className="space-y-2">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/product"
                       className="text-gray-700 hover:text-indigo-600 hover:bg-gray-100 px-2 py-1 rounded block transition-colors"
                     >
                       베스트셀러
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/product"
                       className="text-gray-700 hover:text-indigo-600 hover:bg-gray-100 px-2 py-1 rounded block transition-colors"
                     >
                       신상품
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/product"
                       className="text-gray-700 hover:text-indigo-600 hover:bg-gray-100 px-2 py-1 rounded block transition-colors"
                     >
                       특가 상품
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/product"
                       className="text-gray-700 hover:text-indigo-600 hover:bg-gray-100 px-2 py-1 rounded block transition-colors"
                     >
                       전체 보기
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -453,14 +454,15 @@ const Navbar = () => {
                     onMouseEnter={() => handleMenuHover(item.id)}
                     onMouseLeave={() => handleMenuLeave(item.id)}
                   >
-                    <a
-                      href={`/category/${item.id}`}
+                    <Link
+                      // href={`/category/${item.id}`}
+                      to="/product"
                       className={`h-full flex items-center px-4 text-sm font-medium transition-colors ${
                         hoveredMenu === item.id ? "text-indigo-600" : "text-gray-700 hover:text-indigo-600"
                       }`}
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   </div>
                 ))}
               </div>

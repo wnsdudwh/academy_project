@@ -17,7 +17,7 @@ import {
 import OrderHistory from "./order-history"
 import ProfileEdit from "./profile-edit"
 import ShoppingAddressModal from "./shopping-address-modal"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 
 export default function MyPage() 
 {
@@ -34,7 +34,19 @@ export default function MyPage()
     {
       try 
       {
-        setIsLoading(true)
+        setIsLoading(true);
+        const token = localStorage.getItem("token");
+
+        // 토큰이 없으면 API를 호출하지 않고 함수를 종료시킵니다.
+        if (!token)
+        {
+          console.error("토큰이 없어 my-page 정보를 불러올 수 없습니다.");
+          setIsLoading(false);
+          // 선택: 이 경우 로그인 페이지로 보내버릴 수도 있습니다.
+          // navigate('/login');
+          return;
+        }
+
         const response = await axiosInstance.get("/auth/mypage");
 
         // 실제 서비스에서는 이런 데이터가 추가로 있을 것입니다
@@ -339,9 +351,9 @@ export default function MyPage()
       {/* 메뉴 그리드 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {menuItems.map((item, index) => (
-          <a
+          <Link
             key={index}
-            href={item.link}
+            to={item.link}
             className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative"
             onClick={(e) => {
               if (item.onClick) {
@@ -362,7 +374,7 @@ export default function MyPage()
                 {item.badge}
               </span>
             )}
-          </a>
+          </Link>
         ))}
       </div>
 

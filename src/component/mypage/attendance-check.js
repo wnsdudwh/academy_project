@@ -53,34 +53,34 @@ const AttendanceCheck = () =>
   }
 
   // 출석 데이터 가져오기 함수 (useEffect에서 분리하여 재사용)
-  const fetchAttendanceData = useCallback(async () => {
+  const fetchAttendanceData = useCallback(async () => 
+  {
     setLoading(true)
-    try {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        setLoading(false)
-        return
-      }
+    try 
+    {
       const year = currentDate.getFullYear()
       const month = currentDate.getMonth() + 1
 
       // ⭐️ 2. fetch 대신 axiosInstance.get 사용
-      const response = await axiosInstance.get('/attendance/list', {
+      const response = await axiosInstance.get('/attendance/list',
+      {
         params: { year, month }
       });
-      setAttendanceDates(response.data.dates);
 
-    } catch (error) {
+      // 👇 [추가] 서버가 실제로 무엇을 보냈는지 확인하기 위한 로그
+      console.log('서버로부터 받은 실제 응답:', response.data);
+
+      setAttendanceDates(response.data.dates);
+    }
+    catch (error)
+    {
       console.error("출석 데이터를 가져오는 중 오류 발생:", error)
-    } finally {
+    }
+    finally
+    {
       setLoading(false)
     }
   }, [currentDate]);
-
-  // 달이 변경될 때마다 출석 데이터를 다시 가져옵니다.
-  useEffect(() => {
-    fetchAttendanceData();
-  }, [fetchAttendanceData]);
 
   // 출석 체크 함수
   const handleAttendanceCheck = async () => 
@@ -94,13 +94,19 @@ const AttendanceCheck = () =>
       // ⭐️ Axios는 응답 데이터를 .data에 담아줍니다. .text()가 아닙니다.
       alert(response.data);
 
-      // ⭐️ 출석 성공 또는 중복 후 달력 새로고침
-      await fetchAttendanceData();
+      // 메인 페이지로 이동
+       navigate('/'); 
     }
     catch (error)
     {
-      console.error("출석 체크 중 오류 발생:", error);
-      alert(error.response?.data || "서버와의 연결 중 오류가 발생했습니다.");
+      const errorMessage = error.response?.data || "서버와의 연결 중 오류가 발생했습니다.";
+      alert(errorMessage);
+
+      // "오늘 이미 출석했습니다!" 메시지를 포함하는 경우에 메인으로 이동.
+      if (errorMessage.includes("이미 오늘 이미 출석했습니다!"))
+      {
+        navigate('/');
+      }
     }
   }
 

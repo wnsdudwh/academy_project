@@ -51,9 +51,9 @@ const Header = () =>
       <div className="header max-w-[1440px] w-full h-full mx-auto flex flex-row justify-between items-center px-6">
         {/* 로고 영역 */}
         <div className="logo-zone basis-1/4">
-          <a href="/">
+          <Link to="/">
             <h1 className="text-2xl font-bold text-primary-700">GuitarHouse</h1>
-          </a>
+          </Link>
         </div>
 
         {/* 퀵메뉴 영역 */}
@@ -74,7 +74,7 @@ const Header = () =>
           {token ? (
             <>
               {/* 마이페이지 */}
-              <a href="/mypage" className="text-gray-700 hover:text-indigo-600 transition-colors">
+              <Link href="/mypage" className="text-gray-700 hover:text-indigo-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -83,10 +83,10 @@ const Header = () =>
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   ></path>
                 </svg>
-              </a>
+              </Link>
 
               {/* 최근 본 상품 */}
-              <a href="/recent" className="text-gray-700 hover:text-indigo-600 transition-colors">
+              <Link href="/recent" className="text-gray-700 hover:text-indigo-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -101,10 +101,10 @@ const Header = () =>
                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                   ></path>
                 </svg>
-              </a>
+              </Link>
 
               {/* 장바구니 */}
-              <a href="/cart" className="text-gray-700 hover:text-indigo-600 transition-colors relative">
+              <Link to="/cart" className="text-gray-700 hover:text-indigo-600 transition-colors relative">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -116,7 +116,7 @@ const Header = () =>
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   3
                 </span>
-              </a>
+              </Link>
 
               {/* 로그아웃 */}
               <button onClick={handleLogout} className="text-gray-700 hover:text-indigo-600 transition-colors">
@@ -148,7 +148,7 @@ const Header = () =>
           ) : (
             <>
               {/* 로그인 - 더 직관적인 아이콘으로 변경 */}
-              <a href="/login" className="text-gray-700 hover:text-indigo-600 transition-colors">
+              <Link to="/login" className="text-gray-700 hover:text-indigo-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -157,10 +157,10 @@ const Header = () =>
                     d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
                   ></path>
                 </svg>
-              </a>
+              </Link>
 
               {/* 회원가입 */}
-              <a href="/register" className="text-gray-700 hover:text-indigo-600 transition-colors">
+              <Link to="/register" className="text-gray-700 hover:text-indigo-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -169,10 +169,10 @@ const Header = () =>
                     d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
                   ></path>
                 </svg>
-              </a>
+              </Link>
 
               {/* 최근 본 상품 */}
-              <a href="/recent" className="text-gray-700 hover:text-indigo-600 transition-colors">
+              <Link to="/recent" className="text-gray-700 hover:text-indigo-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -187,7 +187,7 @@ const Header = () =>
                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                   ></path>
                 </svg>
-              </a>
+              </Link>
             </>
           )}
         </div>
@@ -228,13 +228,13 @@ const Header = () =>
             </div>
 
             <div className="flex justify-between text-sm text-gray-600">
-              <a href="#" className="hover:text-indigo-600">
+              <Link to="#" className="hover:text-indigo-600">
                 전체 상품
-              </a>
+              </Link>
               <span>|</span>
-              <a href="#" className="hover:text-indigo-600">
+              <Link to="#" className="hover:text-indigo-600">
                 최근 검색어
-              </a>
+              </Link>
             </div>
           </div>
         </div>
