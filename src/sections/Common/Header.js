@@ -74,7 +74,7 @@ const Header = () =>
           {token ? (
             <>
               {/* 마이페이지 */}
-              <Link href="/mypage" className="text-gray-700 hover:text-indigo-600 transition-colors">
+              <Link to="/mypage" className="text-gray-700 hover:text-indigo-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -86,7 +86,7 @@ const Header = () =>
               </Link>
 
               {/* 최근 본 상품 */}
-              <Link href="/recent" className="text-gray-700 hover:text-indigo-600 transition-colors">
+              <Link to="/recent" className="text-gray-700 hover:text-indigo-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"

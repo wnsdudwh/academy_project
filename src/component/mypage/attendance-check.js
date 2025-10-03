@@ -62,7 +62,7 @@ const AttendanceCheck = () =>
       const month = currentDate.getMonth() + 1
 
       // ⭐️ 2. fetch 대신 axiosInstance.get 사용
-      const response = await axiosInstance.get('/attendance/list',
+      const response = await axiosInstance.get('/api/attendance/list',
       {
         params: { year, month }
       });
@@ -70,7 +70,7 @@ const AttendanceCheck = () =>
       // 👇 [추가] 서버가 실제로 무엇을 보냈는지 확인하기 위한 로그
       console.log('서버로부터 받은 실제 응답:', response.data);
 
-      setAttendanceDates(response.data.dates);
+      setAttendanceDates(response.data.dates || []);
     }
     catch (error)
     {
@@ -89,7 +89,7 @@ const AttendanceCheck = () =>
     {
       // ⭐️ fetch가 아닌 axiosInstance.post를 사용.
       // 이제 더 이상 token, headers, method 등을 직접 쓸 필요가 없습니다. (axiosInstance 활용)
-      const response = await axiosInstance.post('/attendance/check');
+      const response = await axiosInstance.post('/api/attendance/check');
 
       // ⭐️ Axios는 응답 데이터를 .data에 담아줍니다. .text()가 아닙니다.
       alert(response.data);
@@ -103,7 +103,7 @@ const AttendanceCheck = () =>
       alert(errorMessage);
 
       // "오늘 이미 출석했습니다!" 메시지를 포함하는 경우에 메인으로 이동.
-      if (errorMessage.includes("이미 오늘 이미 출석했습니다!"))
+      if (errorMessage.includes("오늘 이미 출석했습니다!"))
       {
         navigate('/');
       }
