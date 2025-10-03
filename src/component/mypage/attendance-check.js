@@ -27,7 +27,6 @@ const AttendanceCheck = () =>
           return; // 토큰이 없으면 실행 중단
       }
 
-      
   // 토큰이 있는 경우 출석 데이터 가져오기 함수 호출
   const fetchAttendanceData = async () => 
   {
@@ -103,12 +102,7 @@ const AttendanceCheck = () =>
     {
       const errorMessage = error.response?.data || "서버와의 연결 중 오류가 발생했습니다.";
       alert(errorMessage);
-
-      // "오늘 이미 출석했습니다!" 메시지를 포함하는 경우에 메인으로 이동.
-      if (errorMessage.includes("오늘 이미 출석했습니다!"))
-      {
-        navigate('/');
-      }
+      navigate('/');
     }
   }
 
